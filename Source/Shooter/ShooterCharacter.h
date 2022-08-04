@@ -6,6 +6,15 @@
 #include "GameFramework/Character.h"
 #include "ShooterCharacter.generated.h"
 
+UENUM(BlueprintType)
+enum class EAmmoType : uint8
+{
+	EAT_9MM UMETA( DisplayName = "9mm"),
+	EAT_AR UMETA(DisplayName = "AR"),
+
+	EAT_MAX UMETA(DisplayName = "DefaultValue")
+};
+
 UCLASS()
 class SHOOTER_API AShooterCharacter : public ACharacter
 {
@@ -86,6 +95,9 @@ protected:
 
 	//Swap Weapon
 	void SwapWeapon(AWeapon* SwapWeapon);
+
+	// init Start Char Ammo
+	void InitAmmo();
 	
 private:
 
@@ -237,6 +249,18 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Items, meta = (AllowPrivateAccess = "true"))
 	float CameraInterpElevation;
 
+	//Store Char Ammo
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	TMap<EAmmoType, int32> AmmoCharacter;
+
+	//Start int 9mm ammo
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	int32 Init9mmAmmo;
+
+	//Start int AR ammo
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	int32 InitARAmmo;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -256,4 +280,6 @@ public:
 	void IncrementAgroCountItem(int8 Amount);
 
 	FVector GetCameraInterpLocation();
+
+	void GetPickupItem(class AItem* Item);
 };

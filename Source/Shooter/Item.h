@@ -57,6 +57,12 @@ protected:
 	//Set properties item 
 	void SetItemProperties(EItemStates State);
 
+	//Call when TimerCurve finish //call when TimerCurve end / stop interp movement to camera char
+	void FinishInterpItem();
+
+	// Call if IsBeTaken true. after that start interp movement item
+	void ItemInterp(float DeltaTime);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -98,6 +104,34 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	EItemStates ItemStates;
 
+	//store make in editor curve for pickup item
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Curve", meta = (AllowPrivateAccess = "true"))
+	class UCurveFloat* ItemZCurve;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Curve", meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* ItemScaleCurve;
+
+	//Store Timer for curve function
+	FTimerHandle TimerCurve;
+
+	//Time how long we will be interp Item
+	float InterpTimeCurve;
+	
+	//true when we start pickup item
+	bool IsBeTaken;
+
+	//store intin location when we pickup item
+	FVector ItemStartCurveLocation;
+
+	//store player camera location
+	FVector CameraPlayerLocation;
+
+	UPROPERTY()
+	class AShooterCharacter* Character;
+
+	// variable for store initial rotation item when we start pickup interp
+	float InterpInitialYawOffset;
+
 public:
 	//Return PickUpWidget/CollisionBox/AgroSphere
 	FORCEINLINE UWidgetComponent* GetPickUpWidget() const { return PickUpWidget; }
@@ -109,5 +143,6 @@ public:
 	FORCEINLINE EItemStates GetItemStates() const { return ItemStates; }
 	void SetItemStates(EItemStates State);
 
-
+	//Char call when start pickup item
+	void StartCurveItem(AShooterCharacter* Char);
 };

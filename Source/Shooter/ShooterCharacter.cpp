@@ -56,7 +56,9 @@ AShooterCharacter::AShooterCharacter() :
 	AgroCountItem(0.f),
 	//properties for Items CameraLocation
 	CameraInterpDistance(250.f),
-	CameraInterpElevation(65.f)
+	CameraInterpElevation(65.f),
+	Init9mmAmmo(9),
+	InitARAmmo(30)
 
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -91,6 +93,9 @@ AShooterCharacter::AShooterCharacter() :
 void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	check(FollowCamera);
+
 	if (FollowCamera)
 	{
 		DefaultCameraFOV = FollowCamera->FieldOfView;
@@ -197,7 +202,9 @@ void AShooterCharacter::SelectButtonPressed()
 	if (TraceHitItem)
 	{
 		auto Weapon = Cast<AWeapon>(TraceHitItem);
-		SwapWeapon(Weapon);
+		if (!Weapon) return;
+		Weapon->StartCurveItem(this);
+		//SwapWeapon(Weapon);
 		TraceHitItem = nullptr;
 		TraceHitItemLast = nullptr;
 	}
@@ -212,6 +219,22 @@ void AShooterCharacter::SwapWeapon(AWeapon* SwapWeapon)
 {
 	DropWeapon();
 	EquipWeapon(SwapWeapon);
+}
+
+void AShooterCharacter::InitAmmo()
+{
+	AmmoCharacter.Add(EAmmoType::EAT_9MM, Init9mmAmmo);
+	AmmoCharacter.Add(EAmmoType::EAT_AR, InitARAmmo);
+
+}
+
+void AShooterCharacter::GetPickupItem(AItem* Item)
+{
+	AWeapon* Weapon = Cast<AWeapon>(Item);
+	if (Weapon)
+	{
+		SwapWeapon(Weapon);
+	}
 }
 
 void AShooterCharacter::CalculateCrosshireSpead(float DeltaTime)
