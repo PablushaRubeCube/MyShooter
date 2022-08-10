@@ -8,7 +8,8 @@ DEFINE_LOG_CATEGORY_STATIC(LogWeapon, All, All)
 AWeapon::AWeapon():
 TimeThrowWeapon (0.75),
 bWeaponFalling (false),
-MeshRotation(0.f)
+MeshRotation(0.f),
+Ammo(30)
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -39,23 +40,23 @@ void AWeapon::ThrowWeapon()
 
 	//GetVEctor
 	const FVector ForwardVector { GetSkeletalMeshComponent()->GetForwardVector() };
-	UE_LOG(LogWeapon, Warning, TEXT("ForwardVector value is: %s"), *ForwardVector.ToString());
 	const FVector RightVector { GetSkeletalMeshComponent()->GetRightVector() };
-	UE_LOG(LogWeapon, Warning, TEXT("RightVector value is: %s"), *RightVector.ToString());
 	//Caclulate Direction Impulse
 	FVector ImpulseDirection = RightVector.RotateAngleAxis(-20.f, ForwardVector);
-	UE_LOG(LogWeapon, Warning, TEXT("ImpulseDirection value is: %s"), *ImpulseDirection.ToString());
 	float RandomRotation = { 30.f };
 	ImpulseDirection = RightVector.RotateAngleAxis(RandomRotation, FVector(0.f,0.f,1.f));
-	UE_LOG(LogWeapon, Warning, TEXT("ImpulseDirection value is: %s"), *ImpulseDirection.ToString());
 	ImpulseDirection *= 4000.f;
-	UE_LOG(LogWeapon, Warning, TEXT("ImpulseDirection value is: %s"), *ImpulseDirection.ToString());
 
 	//Throw
 	GetSkeletalMeshComponent()->AddImpulse(ImpulseDirection);
 
 	//When Time is over change State and "bWeaponFalling"
 	GetWorldTimerManager().SetTimer(TimerThrowWeapon,this, &AWeapon::StopFalling, TimeThrowWeapon, false);
+}
+
+void AWeapon::DecrementAmmo()
+{
+	Ammo <= 0 ? Ammo = 0 : Ammo--;
 }
 
 void AWeapon::StopFalling()

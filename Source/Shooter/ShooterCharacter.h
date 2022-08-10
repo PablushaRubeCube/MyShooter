@@ -98,6 +98,9 @@ protected:
 
 	// init Start Char Ammo
 	void InitAmmo();
+
+	/**if ammo current weapon empty return true */
+	bool IsAmmoEmpty();
 	
 private:
 

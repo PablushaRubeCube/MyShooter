@@ -17,6 +17,8 @@
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogCharacter, All, All)
+
 // Sets default values
 AShooterCharacter::AShooterCharacter() :
 	//Default rate, overide this it tick function
@@ -228,6 +230,12 @@ void AShooterCharacter::InitAmmo()
 
 }
 
+bool AShooterCharacter::IsAmmoEmpty()
+{
+	if (!EquippedWeapon) return true;
+	return EquippedWeapon->GetAmmo() <= 0;
+}
+
 void AShooterCharacter::GetPickupItem(AItem* Item)
 {
 	AWeapon* Weapon = Cast<AWeapon>(Item);
@@ -294,7 +302,10 @@ void AShooterCharacter::EndCrosshiresFire()
 void AShooterCharacter::FireButtonPressed()
 {
 	bFireButtonPressed = true;
-	StartAutoFire();
+	if (!IsAmmoEmpty())
+	{
+		StartAutoFire();
+	}
 }
 
 void AShooterCharacter::FireButtonReleased()
@@ -315,12 +326,14 @@ void AShooterCharacter::StartAutoFire()
 
 void AShooterCharacter::ResetAutoShooting()
 {
-	bShouldFire = true;
-	if (bFireButtonPressed)
+	if (!IsAmmoEmpty())
 	{
-		StartAutoFire();
+		bShouldFire = true;
+		if (bFireButtonPressed)
+		{
+			StartAutoFire();
+		}
 	}
-	
 }
 
 bool AShooterCharacter::ToogleVisibilityWidgetPickUp(FHitResult& PickUpitem, FVector& OutVector)
@@ -356,7 +369,6 @@ bool AShooterCharacter::ToogleVisibilityWidgetPickUp(FHitResult& PickUpitem, FVe
 		{
 			return true;
 		}
-
 	}
 	return false;
 }
@@ -488,22 +500,21 @@ void AShooterCharacter::MouseLookUp(float Value)
 
 void AShooterCharacter::FireWeapon()
 {
+	if (!EquippedWeapon) return;
 	//play sound
 	if (FireShotSound)
 	{
 		UGameplayStatics::PlaySound2D(this, FireShotSound);
 	}
 
-	//EMITTERS: spawn emitters when we shoot
-	const USkeletalMeshSocket* BarrelSocket = GetMesh()->GetSocketByName(TEXT("BarrelSocket"));//get socket weapon
+	const USkeletalMeshSocket* BarrelSocket = EquippedWeapon->GetSkeletalMeshComponent()->GetSocketByName(TEXT("BarrelSocket"));//get socket weapon
 	if (BarrelSocket)//..we have socket for shoot?
 	{
-		const FTransform SocketTransform = BarrelSocket->GetSocketTransform(GetMesh());//get socket transform
+		const FTransform SocketTransform = BarrelSocket->GetSocketTransform(EquippedWeapon->GetSkeletalMeshComponent());//get socket transform
 		if (MuzzleFlash)// if we have ShotParticles->Spawn
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
 		}
-
 		//Update BeamEndPoint for Particles
 		FVector BeamEndPoint;
 		bool bBeamLocation = GetBeamEndLocation(SocketTransform.GetLocation(), BeamEndPoint);
@@ -521,7 +532,6 @@ void AShooterCharacter::FireWeapon()
 			}
 		}
 	}		
-
 	//AnimMontage for HipFireAnimation 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && HipFireMontage)
@@ -529,9 +539,10 @@ void AShooterCharacter::FireWeapon()
 		AnimInstance->Montage_Play(HipFireMontage);
 		AnimInstance->Montage_JumpToSection(FName("Start_Fire"));
 	}
-
 	//Change Spread bool bShooting and start timer
 	StartCrosshiresFire();
+	//decrement bullet current weapon
+	EquippedWeapon->DecrementAmmo();
 }
 
 bool AShooterCharacter::GetBeamEndLocation(const FVector& SocketBeam, FVector& OutBeamLocation)
