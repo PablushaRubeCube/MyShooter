@@ -9,7 +9,11 @@ AWeapon::AWeapon():
 TimeThrowWeapon (0.75),
 bWeaponFalling (false),
 MeshRotation(0.f),
-Ammo(30)
+Ammo(30),
+MagazineCapacity(30),
+WeaponType(EWeaponType::EWT_SubmachineGun),
+AmmoType(EAmmoType::EAT_9MM),
+MontageWeaponName("Reload_SMG")
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -57,6 +61,17 @@ void AWeapon::ThrowWeapon()
 void AWeapon::DecrementAmmo()
 {
 	Ammo <= 0 ? Ammo = 0 : Ammo--;
+}
+
+void AWeapon::ReloadMagazine(int32 Value)
+{
+	checkf(MagazineCapacity >= Ammo + Value, TEXT("Reload Ammo more than MagazineCapacity"));
+
+	Ammo += Value;
+	//if (MagazineCapacity >= Ammo + Value)
+	//{
+	//	
+	//}
 }
 
 void AWeapon::StopFalling()

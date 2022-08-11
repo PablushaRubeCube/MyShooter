@@ -4,8 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Item.h"
+#include "AmmoType.h"
 #include "Weapon.generated.h"
 
+UENUM(BlueprintType)
+enum class EWeaponType : uint8 
+{
+	EWT_SubmachineGun UMETA(DisplayName"SMG"),
+	EWT_AssaultRifle UMETA(DisplayName "Rifle"),
+
+	EWT_MAX UMETA(DisplayName "Default")
+};
 /**
  * 
  */
@@ -19,19 +28,41 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	AWeapon();
-protected:
 
-	void StopFalling();
-private:
+private://variables
 
 	FTimerHandle TimerThrowWeapon;
 	float TimeThrowWeapon;
 	bool bWeaponFalling;
 	FRotator MeshRotation;
 
+protected://variables
+
 	/**Store Ammo Value current Weapon*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
 	int32 Ammo;
+
+	/** Store Max Magazine Capacity*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
+	int32 MagazineCapacity;
+
+	//Store type of Weapon
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	EWeaponType WeaponType;
+
+	//Store Type of use Ammo
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	EAmmoType AmmoType;
+
+	//Store anim montage Name current weapon
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	FName MontageWeaponName;
+
+
+
+protected://functions
+
+	void StopFalling();
 
 public:
 	/** Call when player Throw Weapon */
@@ -39,8 +70,16 @@ public:
 
 	/**Get Ammo Current Weapon  */
 	FORCEINLINE int32 GetAmmo() const { return Ammo; }
+	/**Get Max Current Weapon Magazine Capacity  */
+	FORCEINLINE int32 GetMagazineCapacity() const { return MagazineCapacity; }
 
+	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; }
+	FORCEINLINE EAmmoType GetAmmoType() const { return AmmoType; }
+	FORCEINLINE FName GetMontageWeaponSectionName() const { return MontageWeaponName; }
 	/** Decrement Ammo when we Shoot */
 	void DecrementAmmo();
+
+	/** Reload Magazine Current Weapon*/
+	void ReloadMagazine(int32 Value);
 
 };

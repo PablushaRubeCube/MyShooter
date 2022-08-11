@@ -4,15 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "AmmoType.h"
 #include "ShooterCharacter.generated.h"
 
-UENUM(BlueprintType)
-enum class EAmmoType : uint8
-{
-	EAT_9MM UMETA( DisplayName = "9mm"),
-	EAT_AR UMETA(DisplayName = "AR"),
 
-	EAT_MAX UMETA(DisplayName = "DefaultValue")
+UENUM(BlueprintType)
+enum class ECombatState : uint8
+{
+ECS_Unoccupied UMETA(DisplayName = "Unoccupied"),
+ECS_FireTimerProgress UMETA(DisplayName = "FireInProgress"),
+ECS_Reloading UMETA(DisplayName = "Reloading"),
+
+ECS_MAX UMETA(DisplayName = "Default")
 };
 
 UCLASS()
@@ -101,7 +104,28 @@ protected:
 
 	/**if ammo current weapon empty return true */
 	bool IsAmmoEmpty();
+
+	/** Play sound if we fire*/
+	void PlayFireSound();
+
+	/** main function when we fire*/
+	void SendBullet();
+
+	/** play anim when we fire*/
+	void PlayGunFireMontage();
+
+	/** Call when we press the button*/
+	void ReloadButtonPressed();
 	
+	/** Main Function When we Reload*/
+	void ReloadWeapon();
+
+	//Call When reload animation near to end
+	UFUNCTION(BlueprintCallable)
+	void FinishReloading();
+
+	// Check if current wepon have ammo
+	bool CarryingAmmo();
 private:
 
 	//Camera boom positioning the camera behind the character
@@ -170,6 +194,10 @@ private:
 	//combat montage for shot
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	class UAnimMontage* HipFireMontage;
+
+	// store Reload montage 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* ReloadMontage;
 
 	//true when we aim
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
@@ -263,6 +291,10 @@ private:
 	//Start int AR ammo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	int32 InitARAmmo;
+
+	/** Combat State, can only fire or reload */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	ECombatState CombatState;
 
 public:	
 	// Called every frame
