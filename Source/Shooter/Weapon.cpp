@@ -13,7 +13,8 @@ Ammo(30),
 MagazineCapacity(30),
 WeaponType(EWeaponType::EWT_SubmachineGun),
 AmmoType(EAmmoType::EAT_9MM),
-MontageWeaponName("Reload_SMG")
+MontageWeaponName("Reload_SMG"),
+ClipBoneName("smg_clip")
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;

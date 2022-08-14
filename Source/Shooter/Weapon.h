@@ -58,7 +58,12 @@ protected://variables
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	FName MontageWeaponName;
 
+	// Store Clip weapon bone Name
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	FName ClipBoneName;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Weapon")
+	bool IsClipTaked;
 
 protected://functions
 
@@ -76,6 +81,8 @@ public:
 	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; }
 	FORCEINLINE EAmmoType GetAmmoType() const { return AmmoType; }
 	FORCEINLINE FName GetMontageWeaponSectionName() const { return MontageWeaponName; }
+	FORCEINLINE FName GetClipBoneName() const { return ClipBoneName; }
+	FORCEINLINE void SetIsClipTaked(bool ClipState) { IsClipTaked = ClipState; }
 	/** Decrement Ammo when we Shoot */
 	void DecrementAmmo();
 

@@ -6,6 +6,29 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
+UShooterAnimInstance::UShooterAnimInstance()
+{
+}
+
+void UShooterAnimInstance::TurnInPlace(AShooterCharacter* Char)
+{
+	LastCharacterYaw = CharacterYaw;
+
+	if (Speed > 0)
+	{
+		//we dont want turn when we moving
+	}
+	else
+	{
+		if (!Char) return;
+		CharacterYaw = Char->GetActorRotation().Yaw;
+
+		const float Delta = (CharacterYaw - LastCharacterYaw);
+
+		CharacterYawOffset -= Delta;
+	}
+}
+
 void  UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
 {
 	if (ShooterCharacter == nullptr)
@@ -41,6 +64,7 @@ void  UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
 		}
 		bAiming = ShooterCharacter->GetAimingCondition();
 	}
+	TurnInPlace(ShooterCharacter);
 }
 
 

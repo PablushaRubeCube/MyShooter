@@ -126,6 +126,14 @@ protected:
 
 	// Check if current wepon have ammo
 	bool CarryingAmmo();
+
+	// Attach clip current weapon when we reload
+	UFUNCTION(BlueprintCallable)
+	void TakeClip();
+
+	// Released clip current weapon when we finish reload
+	UFUNCTION(BlueprintCallable)
+	void ReturnClip();
 private:
 
 	//Camera boom positioning the camera behind the character
@@ -296,6 +304,10 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	ECombatState CombatState;
 
+	//Clip Attach for this SceneComponent when we reload clip
+	UPROPERTY()
+	USceneComponent* HandSceneComponent;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -311,6 +323,10 @@ public:
 
 	//Return Aiming condition our char
 	FORCEINLINE bool GetAimingCondition() const { return bAiming; }
+
+	//Return HandComponent for clip reload function
+	UFUNCTION(BlueprintPure)
+	USceneComponent* GetHandSceneComponent() const { return HandSceneComponent; }
 
 	void IncrementAgroCountItem(int8 Amount);
 

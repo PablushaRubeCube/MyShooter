@@ -41,7 +41,7 @@ public:
 	// Sets default values for this actor's properties
 	AItem();
 
-protected:
+protected://functions
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -63,11 +63,7 @@ protected:
 	// Call if IsBeTaken true. after that start interp movement item
 	void ItemInterp(float DeltaTime);
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-private:
+private:// variables
 	//Skeletal Mesh of item
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	class USkeletalMeshComponent* ItemMesh;
@@ -132,7 +128,20 @@ private:
 	// variable for store initial rotation item when we start pickup interp
 	float InterpInitialYawOffset;
 
-public:
+protected://variables
+
+	/** Sound pickup current item */
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	class USoundCue* PickupSound;
+
+	/** Sound Equip current item */
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundCue* EquipSound;
+
+public://functions
+
+	virtual void Tick(float DeltaTime) override;
+
 	//Return PickUpWidget/CollisionBox/AgroSphere
 	FORCEINLINE UWidgetComponent* GetPickUpWidget() const { return PickUpWidget; }
 	FORCEINLINE UBoxComponent* GetCollisionBox() const { return CollisionBox; }
@@ -145,4 +154,8 @@ public:
 
 	//Char call when start pickup item
 	void StartCurveItem(AShooterCharacter* Char);
+
+	//Get Sounds
+	FORCEINLINE USoundCue* GetPickupSound() const { return PickupSound; }
+	FORCEINLINE USoundCue* GetEquipSound() const { return EquipSound; }
 };

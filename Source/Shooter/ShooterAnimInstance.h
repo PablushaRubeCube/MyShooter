@@ -14,7 +14,11 @@ class SHOOTER_API UShooterAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 
-private:
+public:
+
+	UShooterAnimInstance();
+
+private://variables
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	class AShooterCharacter* ShooterCharacter;
@@ -38,6 +42,17 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	bool bAiming;
+
+	float CharacterYaw;
+
+	float LastCharacterYaw;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float CharacterYawOffset;
+
+private://functions
+
+	void TurnInPlace(AShooterCharacter* Char);
 
 public:
 	

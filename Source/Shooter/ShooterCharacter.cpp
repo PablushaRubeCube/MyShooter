@@ -79,7 +79,7 @@ AShooterCharacter::AShooterCharacter() :
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 
-	
+	HandSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("HandComponent"));
 
 	//Disable controller rotate for mesh. let the controller onlu affect the camera.
 	bUseControllerRotationPitch = false;
@@ -100,6 +100,7 @@ void AShooterCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	check(FollowCamera);
+	check(HandSceneComponent);
 
 	if (FollowCamera)
 	{
@@ -214,8 +215,10 @@ void AShooterCharacter::SelectButtonPressed()
 		//SwapWeapon(Weapon);
 		TraceHitItem = nullptr;
 		TraceHitItemLast = nullptr;
+
+		if (Weapon->GetPickupSound())
+		UGameplayStatics::PlaySound2D(this, Weapon->GetPickupSound());
 	}
-	
 }
 
 void AShooterCharacter::SelectButtonReleased()
@@ -352,11 +355,32 @@ bool AShooterCharacter::CarryingAmmo()
 	return false;
 }
 
+void AShooterCharacter::TakeClip()
+{
+	if (!EquippedWeapon || !HandSceneComponent) return;
+	const int32 BoneIndexClip = EquippedWeapon->GetSkeletalMeshComponent()->GetBoneIndex(EquippedWeapon->GetClipBoneName());
+	const FTransform BoneTransformClip = EquippedWeapon->GetSkeletalMeshComponent()->GetBoneTransform(BoneIndexClip);
+
+	FAttachmentTransformRules AttachmentRules (EAttachmentRule::KeepRelative, true);
+	HandSceneComponent->AttachToComponent(GetMesh(), AttachmentRules, FName(TEXT("Hand_L")));
+	HandSceneComponent->SetWorldTransform(BoneTransformClip);
+
+	EquippedWeapon->SetIsClipTaked(true);
+}
+
+void AShooterCharacter::ReturnClip()
+{
+	EquippedWeapon->SetIsClipTaked(false);
+}
+
 void AShooterCharacter::GetPickupItem(AItem* Item)
 {
 	AWeapon* Weapon = Cast<AWeapon>(Item);
 	if (Weapon)
 	{
+		if (Weapon->GetEquipSound())
+		UGameplayStatics::PlaySound2D(this, Weapon->GetEquipSound());
+
 		SwapWeapon(Weapon);
 	}
 }
