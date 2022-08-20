@@ -20,6 +20,11 @@ ClipBoneName("smg_clip")
 	PrimaryActorTick.bCanEverTick = true;
 }
 
+bool AWeapon::IsMagazineFull()
+{
+	return MagazineCapacity == Ammo;
+}
+
 // Called every frame
 void AWeapon::Tick(float DeltaTime)
 {

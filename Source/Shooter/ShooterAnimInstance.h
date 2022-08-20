@@ -20,7 +20,7 @@ public:
 
 private://variables
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
 	class AShooterCharacter* ShooterCharacter;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
@@ -40,26 +40,40 @@ private://variables
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	float LastMovementOffsetYaw;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	bool bAiming;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	bool bCharacterIsReloading;
 
 	float CharacterYaw;
 
 	float LastCharacterYaw;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	float CharacterYawOffset;
+	float RootYawOffset;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float ControllerPitch;
+
+	/** Rotation curve value this frame*/
+	float RotationCurve;
+	/** Rotation curve value last frame*/
+	float LastRotationCurve;
 
 private://functions
 
-	void TurnInPlace(AShooterCharacter* Char);
+	void InPlace(AShooterCharacter* Char);
+
+	void TurnInPlaceAnimationPlaying(const float& IsTurnInPlaceAnimationPlaying);
+
+	//Reset 
+	void ResetTurnInPlaceVariables(AShooterCharacter* Char);
 
 public:
 	
 	UFUNCTION(BlueprintCallable)
 	void UpdateAnimationProperties(float DeltaTime);
-
-
 
 	virtual void NativeInitializeAnimation() override;
 };

@@ -89,4 +89,6 @@ public:
 	/** Reload Magazine Current Weapon*/
 	void ReloadMagazine(int32 Value);
 
+	bool IsMagazineFull();
+
 };

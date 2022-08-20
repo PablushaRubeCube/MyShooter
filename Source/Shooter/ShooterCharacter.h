@@ -333,4 +333,7 @@ public:
 	FVector GetCameraInterpLocation();
 
 	void GetPickupItem(class AItem* Item);
+
+	FORCEINLINE ECombatState GetECombatState() const { return CombatState; }
+
 };
