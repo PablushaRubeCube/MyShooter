@@ -134,6 +134,9 @@ protected:
 	// Released clip current weapon when we finish reload
 	UFUNCTION(BlueprintCallable)
 	void ReturnClip();
+
+	void CrouchButtonPressed();
+
 private:
 
 	//Camera boom positioning the camera behind the character
@@ -308,6 +311,8 @@ private:
 	UPROPERTY()
 	USceneComponent* HandSceneComponent;
 
+	bool bIsCrouch;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -335,5 +340,7 @@ public:
 	void GetPickupItem(class AItem* Item);
 
 	FORCEINLINE ECombatState GetECombatState() const { return CombatState; }
+
+	FORCEINLINE bool GetIsCrouch() const { return bIsCrouch; }
 
 };

@@ -373,6 +373,14 @@ void AShooterCharacter::ReturnClip()
 	EquippedWeapon->SetIsClipTaked(false);
 }
 
+void AShooterCharacter::CrouchButtonPressed()
+{
+	if (!GetCharacterMovement()->IsFalling())
+	{
+		bIsCrouch = !bIsCrouch;
+	}
+}
+
 void AShooterCharacter::GetPickupItem(AItem* Item)
 {
 	AWeapon* Weapon = Cast<AWeapon>(Item);
@@ -553,6 +561,8 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction(TEXT("Select"), EInputEvent::IE_Released, this, &AShooterCharacter::SelectButtonReleased);
 
 	PlayerInputComponent->BindAction(TEXT("ReloadButton"), EInputEvent::IE_Pressed, this, &AShooterCharacter::ReloadButtonPressed);
+	
+	PlayerInputComponent->BindAction(TEXT("Crouch"), EInputEvent::IE_Pressed, this, &AShooterCharacter::CrouchButtonPressed);
 }
 
 void AShooterCharacter::IncrementAgroCountItem(int8 Amount)

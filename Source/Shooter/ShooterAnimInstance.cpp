@@ -14,11 +14,17 @@ UShooterAnimInstance::UShooterAnimInstance():
 	MovementOffsetYaw(0.f),
 	LastMovementOffsetYaw(0.f),
 	bAiming(false),
+	bIsCrouch(false),
 	bCharacterIsReloading(false),
 	CharacterYaw(0.f),
 	LastCharacterYaw(0.f),
 	RootYawOffset(0.f),
-	ControllerPitch(0.f)
+	ControllerPitch(0.f),
+	CharacterRotator(0.f),
+	LastCharacterRotator(0.f),
+	YawDelta(0.f),
+	BlendWeight(1.f),
+	bIsTurnInPlaceAnimPlaying(false)
 {
 }
 
@@ -50,6 +56,7 @@ void UShooterAnimInstance::TurnInPlaceAnimationPlaying(const float& IsTurnInPlac
 {
 	if (IsTurnInPlaceAnimationPlaying > 0)
 	{
+		bIsTurnInPlaceAnimPlaying = true;
 		LastRotationCurve = RotationCurve;
 		RotationCurve = GetCurveValue(TEXT("Rotation"));
 		const float DeltaCurve{ RotationCurve - LastRotationCurve };
@@ -62,6 +69,10 @@ void UShooterAnimInstance::TurnInPlaceAnimationPlaying(const float& IsTurnInPlac
 			RootYawOffset > 0 ? RootYawOffset -= YawExcess : RootYawOffset += YawExcess;
 		}
 	}
+	else
+	{
+		bIsTurnInPlaceAnimPlaying = false;
+	}
 }
 
 void UShooterAnimInstance::ResetTurnInPlaceVariables(AShooterCharacter* Char)
@@ -73,38 +84,78 @@ void UShooterAnimInstance::ResetTurnInPlaceVariables(AShooterCharacter* Char)
 	LastRotationCurve = 0.f;
 }
 
-void  UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
+void UShooterAnimInstance::Lean(AShooterCharacter* Char, float DeltaTime)
+{
+	LastCharacterRotator = CharacterRotator;
+	CharacterRotator = Char->GetActorRotation();
+
+	const FRotator DeltaRotator = UKismetMathLibrary::NormalizedDeltaRotator(CharacterRotator, LastCharacterRotator);
+
+	const float Target = (DeltaRotator.Yaw / DeltaTime);
+	const float Interp = FMath::FInterpTo(YawDelta, Target, DeltaTime, 6.f);
+	YawDelta = FMath::Clamp(Interp, -90.f, 90.f);
+}
+
+void UShooterAnimInstance::SetBlendWeight()
+{
+	if (bIsCrouch && !bIsTurnInPlaceAnimPlaying)
+	{
+		BlendWeight = 0.2f;
+	}
+	else if (bIsTurnInPlaceAnimPlaying)
+	{
+		BlendWeight = 0.f;
+	}
+	else
+	{
+		BlendWeight = 1.f;
+	}
+}
+
+bool UShooterAnimInstance::IsCharacterValid()
 {
 	if (ShooterCharacter == nullptr)
 	{
-	ShooterCharacter = Cast<AShooterCharacter>(TryGetPawnOwner());
-	if (!ShooterCharacter) return;
+		ShooterCharacter = Cast<AShooterCharacter>(TryGetPawnOwner());
+		if (!ShooterCharacter) return false;
 	}
+	return true;
+}
+
+void UShooterAnimInstance::SetMovementOffsetYaw()
+{
+	//our char Acceleration? change bool bIsAcceleration
+	(ShooterCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0) ? bIsAcceleration = true : bIsAcceleration = false;
+
+	FRotator AimRotation = ShooterCharacter->GetBaseAimRotation(); //get base offset our aim
+	FRotator MovementRotation = UKismetMathLibrary::MakeRotFromX(ShooterCharacter->GetVelocity());//get offset our movement
+	MovementOffsetYaw = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation).Yaw;
+
+	if (ShooterCharacter->GetVelocity().Size() > 0.f)
+	{
+		LastMovementOffsetYaw = MovementOffsetYaw;
+	}
+}
+
+void  UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
+{
+	if(!IsCharacterValid()) return;
 	
 	//get speed our char
 	FVector Velocity = ShooterCharacter->GetVelocity();
 	Velocity.Z = 0;
 	Speed = Velocity.Size();
 
+	bIsCrouch = ShooterCharacter->GetIsCrouch();
 	//our char IsInAir?
 	bIsInAir = ShooterCharacter->GetCharacterMovement()->IsFalling();
-
-	//our char Acceleration? change bool bIsAcceleration
-	(ShooterCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0) ? bIsAcceleration = true : bIsAcceleration = false;
-
-	FRotator AimRotation = ShooterCharacter->GetBaseAimRotation(); //get base offset our aim
-	FRotator MovementRotation = UKismetMathLibrary::MakeRotFromX(ShooterCharacter->GetVelocity());//get offset our movement
-	MovementOffsetYaw = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation,AimRotation).Yaw;
-
-	if (ShooterCharacter->GetVelocity().Size() > 0.f)
-	{
-		LastMovementOffsetYaw = MovementOffsetYaw ;
-	}
 	bAiming = ShooterCharacter->GetAimingCondition();
-	
-	InPlace(ShooterCharacter);
-}
 
+	SetMovementOffsetYaw();
+	InPlace(ShooterCharacter);
+	Lean(ShooterCharacter, DeltaTime);
+	SetBlendWeight();
+}
 
 void UShooterAnimInstance::NativeInitializeAnimation()
 {

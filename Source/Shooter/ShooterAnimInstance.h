@@ -43,6 +43,9 @@ private://variables
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	bool bAiming;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Crouch", meta = (AllowPrivateAccess = "true"))
+	bool bIsCrouch;
+
 	UPROPERTY(BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	bool bCharacterIsReloading;
 
@@ -61,6 +64,18 @@ private://variables
 	/** Rotation curve value last frame*/
 	float LastRotationCurve;
 
+	FRotator CharacterRotator;
+	FRotator LastCharacterRotator;
+	UPROPERTY(BlueprintReadOnly, Category = "Lean", meta = (AllowPrivateAccess = "true"))
+	float YawDelta;
+
+	/** Set Blend Weight to ShootAnimation*/
+	UPROPERTY(BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float BlendWeight;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Crouch", meta = (AllowPrivateAccess = "true"))
+	bool bIsTurnInPlaceAnimPlaying;
+
 private://functions
 
 	void InPlace(AShooterCharacter* Char);
@@ -69,6 +84,14 @@ private://functions
 
 	//Reset 
 	void ResetTurnInPlaceVariables(AShooterCharacter* Char);
+
+	void Lean(AShooterCharacter* Char, float DeltaTime);
+
+	void SetBlendWeight();
+
+	void SetMovementOffsetYaw();
+
+	bool IsCharacterValid();
 
 public:
 	
