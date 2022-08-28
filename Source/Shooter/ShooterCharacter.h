@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "AmmoType.h"
 #include "ShooterCharacter.generated.h"
 
 
@@ -25,9 +24,15 @@ class SHOOTER_API AShooterCharacter : public ACharacter
 
 public:
 	// Sets default values for this character's properties
-	AShooterCharacter();
+	AShooterCharacter(const FObjectInitializer& ObjInit);
 
-protected:
+private://functions
+
+//	void DisableCameraLag();
+
+	class UShooterCharMovementComponent* qweqwe;
+
+protected://functions
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -43,16 +48,6 @@ protected:
 	void MouseTurn(float Value);
 	void MouseLookUp(float Value);
 
-	//Open fire when we pressed fireButton
-	void FireWeapon();
-
-	//Create and return BeamLocation for particles shots 
-	bool GetBeamEndLocation(const FVector& SocketBeam, FVector& OutBeamLocation);
-
-	//change camera when we aim 
-	void AimButtonPressed();
-	void AimButtomReleased();
-
 	//change zoom camera
 	void InterpZoomFOV(float DeltaTime);
 
@@ -62,82 +57,18 @@ protected:
 	//Change Crosshire Spread when we do anythink
 	void CalculateCrosshireSpead(float DeltaTime);
 
-	//Change Crosshire Spread when we shoting
-	void StartCrosshiresFire();
-	UFUNCTION()
-	void EndCrosshiresFire();
-
-
-	//Call when we pressed LMB
-	void FireButtonPressed();
-	void FireButtonReleased();
-
-	//Timer For AutoShooting
-	void StartAutoFire();
-	UFUNCTION()
-	void ResetAutoShooting();
-
-	//Call When we need Display Widget Item Class and When we Shoot. use 2 linetrace for that
-	bool ToogleVisibilityWidgetPickUp(FHitResult &PickUpitem, FVector &OutVector);
-
 	//call in eventtick for display Widget of item class
 	void DisplayWidget();
-
-	//Spawn Weapon when we start
-	class AWeapon* SpawnDefaultWeapon();
-
-	//EquipWeapon
-	void EquipWeapon(AWeapon* EquipWeapon);
-
-	//Drop Weapon
-	void DropWeapon();
 
 	//Select Button Functions
 	void SelectButtonPressed();
 	void SelectButtonReleased();
 
-	//Swap Weapon
-	void SwapWeapon(AWeapon* SwapWeapon);
-
-	// init Start Char Ammo
-	void InitAmmo();
-
-	/**if ammo current weapon empty return true */
-	bool IsAmmoEmpty();
-
-	/** Play sound if we fire*/
-	void PlayFireSound();
-
-	/** main function when we fire*/
-	void SendBullet();
-
-	/** play anim when we fire*/
-	void PlayGunFireMontage();
-
-	/** Call when we press the button*/
-	void ReloadButtonPressed();
-	
-	/** Main Function When we Reload*/
-	void ReloadWeapon();
-
-	//Call When reload animation near to end
-	UFUNCTION(BlueprintCallable)
-	void FinishReloading();
-
-	// Check if current wepon have ammo
-	bool CarryingAmmo();
-
-	// Attach clip current weapon when we reload
-	UFUNCTION(BlueprintCallable)
-	void TakeClip();
-
-	// Released clip current weapon when we finish reload
-	UFUNCTION(BlueprintCallable)
-	void ReturnClip();
-
 	void CrouchButtonPressed();
 
-private:
+	void ToogleCrouch(bool CharacterIsCrouched);
+
+private://variables
 
 	//Camera boom positioning the camera behind the character
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -145,6 +76,9 @@ private:
 	//CameraComponent Attach to SpringArm socket
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
+	class UWeaponComponent* WeaponComponent;
 
 	//BaseValue to turn our char
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -186,34 +120,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	float AimLookUpAtRate;
 
-	//sound cue for gun shots
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	class USoundCue* FireShotSound;
-
-	//particle effect for gun fire
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	class UParticleSystem* MuzzleFlash;
-
-	//particle effect in shotend
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	UParticleSystem* ImpactParticles;
-
-	//beam smoke
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	UParticleSystem* BeamParticles;
-
-	//combat montage for shot
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	class UAnimMontage* HipFireMontage;
-
-	// store Reload montage 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	UAnimMontage* ReloadMontage;
-
-	//true when we aim
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	bool bAiming;
-
 	//fov for start
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	float DefaultCameraFOV;
@@ -252,17 +158,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Crosshire, meta = (AllowPrivateAccess = "true"))
 	float  CrosshiresShootingFactor;
 
-	//Crosshair 
-	FTimerHandle CrosshiresTimer;
-	bool bShooting;
-	float CrosshiresDelayTimer;
-
-	//Variables for AutoShooting
-	bool bFireButtonPressed;
-	bool bShouldFire;
-	float ShootingRate;
-	FTimerHandle ShootingTimer;
-
 	//true if we overlap any ItemClass
 	bool bOverlapAgroItem;
 
@@ -272,14 +167,6 @@ private:
 	//Need for toogle display widget
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Items, meta = (AllowPrivateAccess = "true"))
 	class AItem* TraceHitItemLast;
-
-	//EquippedWeapon our Char
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	AWeapon* EquippedWeapon;
-
-	//Chose Weapon for Spawn
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	class TSubclassOf<AWeapon> DefaultWeapon;
 
 	//Ref To What we look right now
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
@@ -291,18 +178,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Items, meta = (AllowPrivateAccess = "true"))
 	float CameraInterpElevation;
 
-	//Store Char Ammo
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
-	TMap<EAmmoType, int32> AmmoCharacter;
-
-	//Start int 9mm ammo
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
-	int32 Init9mmAmmo;
-
-	//Start int AR ammo
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
-	int32 InitARAmmo;
-
 	/** Combat State, can only fire or reload */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	ECombatState CombatState;
@@ -311,9 +186,7 @@ private:
 	UPROPERTY()
 	USceneComponent* HandSceneComponent;
 
-	bool bIsCrouch;
-
-public:	
+public://functions	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -325,9 +198,6 @@ public:
 
 	//Return CameraComponent subobject
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-
-	//Return Aiming condition our char
-	FORCEINLINE bool GetAimingCondition() const { return bAiming; }
 
 	//Return HandComponent for clip reload function
 	UFUNCTION(BlueprintPure)
@@ -341,6 +211,7 @@ public:
 
 	FORCEINLINE ECombatState GetECombatState() const { return CombatState; }
 
-	FORCEINLINE bool GetIsCrouch() const { return bIsCrouch; }
+	FORCEINLINE void SetECombatState(ECombatState State) { CombatState = State; }
 
+	bool GetAimingCondition();
 };

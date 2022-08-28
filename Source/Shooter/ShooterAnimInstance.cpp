@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
+
 UShooterAnimInstance::UShooterAnimInstance():
 	ShooterCharacter(nullptr),
 	Speed(0.f),
@@ -98,7 +99,7 @@ void UShooterAnimInstance::Lean(AShooterCharacter* Char, float DeltaTime)
 
 void UShooterAnimInstance::SetBlendWeight()
 {
-	if (bIsCrouch && !bIsTurnInPlaceAnimPlaying)
+	if (bIsCrouch && !bIsTurnInPlaceAnimPlaying && !bCharacterIsReloading)
 	{
 		BlendWeight = 0.2f;
 	}
@@ -146,7 +147,7 @@ void  UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
 	Velocity.Z = 0;
 	Speed = Velocity.Size();
 
-	bIsCrouch = ShooterCharacter->GetIsCrouch();
+	bIsCrouch = ShooterCharacter->bIsCrouched;
 	//our char IsInAir?
 	bIsInAir = ShooterCharacter->GetCharacterMovement()->IsFalling();
 	bAiming = ShooterCharacter->GetAimingCondition();
