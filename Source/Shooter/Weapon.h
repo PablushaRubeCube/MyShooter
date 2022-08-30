@@ -91,4 +91,6 @@ public:
 
 	bool IsMagazineFull();
 
+	virtual UMeshComponent* GetMeshComponent() const { return ItemMesh; }
+
 };

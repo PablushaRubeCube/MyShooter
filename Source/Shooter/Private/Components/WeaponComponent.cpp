@@ -22,7 +22,8 @@ UWeaponComponent::UWeaponComponent() :
 	ShootingRate(0.1f),
 	//Start Ammo value
 	Init9mmAmmo(9),
-	InitARAmmo(30)
+	InitARAmmo(30),
+	bIsWasAiming(false)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -44,6 +45,7 @@ void UWeaponComponent::ReloadWeapon()
 			AnimInstance->Montage_Play(ReloadMontage);
 			AnimInstance->Montage_JumpToSection(EquippedWeapon->GetMontageWeaponSectionName());
 			CharOwner->SetECombatState(ECombatState::ECS_Reloading);
+			bIsWasAiming = bAiming;
 			bAiming = false;
 		}
 	}
@@ -73,6 +75,7 @@ void UWeaponComponent::FinishReloading()
 		const int32 BulletSpend = AmmoCharacter[AmmoType] - EmptySpaceMagazine;
 		AmmoCharacter.Add(AmmoType, BulletSpend);
 	}
+	bIsWasAiming ? bAiming = true : bAiming = false;
 }
 
 bool UWeaponComponent::CarryingAmmo()
@@ -236,9 +239,10 @@ void UWeaponComponent::FireWeapon()
 
 bool UWeaponComponent::GetBeamEndLocation(const FVector& SocketBeam, FVector& OutBeamLocation)
 {
+	if (!CharOwner) return false;
 	//first linetrace from center of screen to target
 	FHitResult BeamHitResult;
-	bool bBeamHit = ToogleVisibilityWidgetPickUp(BeamHitResult, OutBeamLocation);
+	bool bBeamHit = CharOwner->LineTracePickUp(BeamHitResult, OutBeamLocation);
 	if (bBeamHit)
 	{
 		if (BeamHitResult.bBlockingHit)
@@ -308,42 +312,16 @@ void UWeaponComponent::ResetAutoShooting()
 	}
 }
 
-bool UWeaponComponent::ToogleVisibilityWidgetPickUp(FHitResult& PickUpitem, FVector& OutVector)
+bool UWeaponComponent::GetAimingCondition()
 {
-	//Get current size of the viewport
-	FVector2D ViewportSize;
-	if (GEngine && GEngine->GameViewport)
-	{
-		GEngine->GameViewport->GetViewportSize(ViewportSize);
-	}
+	if (!IsCanAim()) return false;
+	return bAiming;
+}
 
-	//Get screen space location of crosshairs
-	FVector2D CrosshairLocation(ViewportSize.X / 2, ViewportSize.Y / 2.f);
-	//CrosshairLocation.Y -= 50.f;
-	FVector CrosshairWorldPosition;
-	FVector CrosshairWorldDirection;
-
-	// Get world position and direction of crosshairs
-	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
-		UGameplayStatics::GetPlayerController(this, 0),
-		CrosshairLocation,
-		CrosshairWorldPosition,
-		CrosshairWorldDirection);
-	if (bScreenToWorld)// was derpojection siccessful?
-	{
-		const FVector StartPoint = CrosshairWorldPosition;
-		const FVector EndPoint = (CrosshairWorldPosition + CrosshairWorldDirection * 50'000.f);
-		OutVector = EndPoint;
-		//trace outward from crosshairs world location
-		if (!GetWorld())return false;
-		GetWorld()->LineTraceSingleByChannel(PickUpitem, StartPoint, EndPoint, ECollisionChannel::ECC_Visibility);
-
-		if (PickUpitem.bBlockingHit)// was there a trace hit?
-		{
-			return true;
-		}
-	}
-	return false;
+bool UWeaponComponent::IsCanAim()
+{
+	if (!CharOwner || CharOwner->GetECombatState() == ECombatState::ECS_Reloading) return false;
+	return true;
 }
 
 // Called when the game starts
@@ -382,7 +360,7 @@ void UWeaponComponent::AimButtonPressed()
 
 void UWeaponComponent::AimButtomReleased()
 {
-	bAiming = false;
+	bAiming = bIsWasAiming = false;
 }
 
 

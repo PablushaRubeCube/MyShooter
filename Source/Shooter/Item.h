@@ -55,7 +55,7 @@ protected://functions
 	void SetRare();
 
 	//Set properties item 
-	void SetItemProperties(EItemStates State);
+	virtual void SetItemProperties(EItemStates State);
 
 	//Call when TimerCurve finish //call when TimerCurve end / stop interp movement to camera char
 	void FinishInterpItem();
@@ -63,22 +63,9 @@ protected://functions
 	// Call if IsBeTaken true. after that start interp movement item
 	void ItemInterp(float DeltaTime);
 
+	//virtual UMeshComponent* GetMeshComponent() const { return ItemMesh; }
+
 private:// variables
-	//Skeletal Mesh of item
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	class USkeletalMeshComponent* ItemMesh;
-
-	//Collides with the box to show widget 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	class UBoxComponent* CollisionBox;
-
-	//widget for show info about item
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	class UWidgetComponent* PickUpWidget;
-
-	//Sphere component to limit area where we can widget toogle 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	class USphereComponent* AgroSphere;
 
 	//Name of specifically item
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
@@ -130,6 +117,22 @@ private:// variables
 
 protected://variables
 
+	//Skeletal Mesh of item
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	class USkeletalMeshComponent* ItemMesh;
+
+	//Collides with the box to show widget 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Base Properties")
+	class UBoxComponent* CollisionBox;
+
+	//widget for show info about item
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Base Properties")
+	class UWidgetComponent* PickUpWidget;
+
+	//Sphere component to limit area where we can widget toogle 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Base Properties")
+	class USphereComponent* AgroSphere;
+
 	/** Sound pickup current item */
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	class USoundCue* PickupSound;
@@ -148,6 +151,8 @@ public://functions
 	FORCEINLINE USphereComponent* GetAgroSphere() const { return  AgroSphere; }
 
 	FORCEINLINE USkeletalMeshComponent* GetSkeletalMeshComponent() const { return ItemMesh; }
+
+
 	//Set/get for State Item
 	FORCEINLINE EItemStates GetItemStates() const { return ItemStates; }
 	void SetItemStates(EItemStates State);

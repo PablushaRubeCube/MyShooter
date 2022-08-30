@@ -81,6 +81,8 @@ private://variables
 	float ShootingRate;
 	FTimerHandle ShootingTimer;
 
+	bool bIsWasAiming;
+
 private://functions
 
 	/** Main Function When we Reload*/
@@ -141,6 +143,8 @@ private://functions
 	UFUNCTION()
 	void ResetAutoShooting();
 
+	bool IsCanAim();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -150,10 +154,7 @@ public:
 	//virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 			//Return Aiming condition our char
-	FORCEINLINE bool GetAimingCondition() const { return bAiming; }
-
-	//Call When we need Display Widget Item Class and When we Shoot. use 2 linetrace for that
-	bool ToogleVisibilityWidgetPickUp(FHitResult& PickUpitem, FVector& OutVector);
+	bool GetAimingCondition();
 
 	//Swap Weapon
 	void SwapWeapon(AWeapon* SwapWeapon);

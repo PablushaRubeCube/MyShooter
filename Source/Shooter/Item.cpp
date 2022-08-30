@@ -28,7 +28,7 @@ InterpInitialYawOffset(0.f)
 	SetRootComponent(ItemMesh);
 
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
-	CollisionBox->SetupAttachment(ItemMesh);
+	CollisionBox->SetupAttachment(GetRootComponent());
 	CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 
@@ -51,7 +51,6 @@ void AItem::BeginPlay()
 	
 	SetRare();
 	SetItemProperties(ItemStates);
-
 }
 
 void AItem::BeginOverlapAgroSphere(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

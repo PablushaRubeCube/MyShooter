@@ -124,7 +124,7 @@ void AShooterCharacter::DisplayWidget()
 	{
 	FHitResult PickUpItem;
 	FVector TempVector;
-	WeaponComponent->ToogleVisibilityWidgetPickUp(PickUpItem, TempVector);
+	LineTracePickUp(PickUpItem, TempVector);
 		if (PickUpItem.bBlockingHit)
 		{
 			TraceHitItem = Cast <AItem>(PickUpItem.Actor);
@@ -152,19 +152,56 @@ void AShooterCharacter::DisplayWidget()
 	}
 }
 
+bool AShooterCharacter::LineTracePickUp(FHitResult& PickUpitem, FVector& OutVector)
+{
+	//Get current size of the viewport
+	FVector2D ViewportSize = FVector2D::ZeroVector;
+	if (GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	}
+
+	//Get screen space location of crosshairs
+	FVector2D CrosshairLocation(ViewportSize.X / 2, ViewportSize.Y / 2.f);
+	FVector CrosshairWorldPosition = FVector::ZeroVector;
+	FVector CrosshairWorldDirection = FVector::ZeroVector;
+
+	// Get world position and direction of crosshairs
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this, 0),
+		CrosshairLocation,
+		CrosshairWorldPosition,
+		CrosshairWorldDirection);
+	if (bScreenToWorld)// was derpojection successful?
+	{
+		const FVector StartPoint = CrosshairWorldPosition;
+		const FVector EndPoint = (CrosshairWorldPosition + CrosshairWorldDirection * 50'000.f);
+		OutVector = EndPoint;
+		//trace outward from crosshairs world location
+		if (!GetWorld())return false;
+		GetWorld()->LineTraceSingleByChannel(PickUpitem, StartPoint, EndPoint, ECollisionChannel::ECC_Visibility);
+
+		if (PickUpitem.bBlockingHit)// was there a trace hit?
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void AShooterCharacter::SelectButtonPressed()
 {
 	if (TraceHitItem)
 	{
-		auto Weapon = Cast<AWeapon>(TraceHitItem);
-		if (!Weapon) return;
-		Weapon->StartCurveItem(this);
+		auto Item = Cast<AItem>(TraceHitItem);
+		if (!Item) return;
+		Item->StartCurveItem(this);
 		//SwapWeapon(Weapon);
 		TraceHitItem = nullptr;
 		TraceHitItemLast = nullptr;
 
-		if (Weapon->GetPickupSound())
-		UGameplayStatics::PlaySound2D(this, Weapon->GetPickupSound());
+		if (Item->GetPickupSound())
+		UGameplayStatics::PlaySound2D(this, Item->GetPickupSound());
 	}
 }
 

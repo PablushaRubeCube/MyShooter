@@ -65,7 +65,6 @@ protected://functions
 	void SelectButtonReleased();
 
 	void CrouchButtonPressed();
-
 	void ToogleCrouch(bool CharacterIsCrouched);
 
 private://variables
@@ -214,4 +213,6 @@ public://functions
 	FORCEINLINE void SetECombatState(ECombatState State) { CombatState = State; }
 
 	bool GetAimingCondition();
+
+	bool LineTracePickUp(FHitResult& PickUpitem, FVector& OutVector);
 };
