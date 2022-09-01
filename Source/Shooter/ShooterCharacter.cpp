@@ -6,51 +6,18 @@
 #include "Camera/CameraComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Item.h"
-#include "Components/WidgetComponent.h"
 #include "Weapon.h"
+#include "Items/Ammo/Ammo.h"
+#include "Components/WidgetComponent.h"
 #include "Components/ShooterCharMovementComponent.h"
 #include "Components/WeaponComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Sound/SoundCue.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCharacter, All, All)
 
 // Sets default values
 AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjInit) :
-	Super (ObjInit.SetDefaultSubobjectClass<UShooterCharMovementComponent>(ACharacter::CharacterMovementComponentName)),
-	//Default rate, overide this it tick function
-	BaseTurnAtRate(100.f),
-	BaseLookUpAtRate(100.f),
-	//Mouse Sensetivity
-	MouseHipTurn(1.f),
-	MouseHipLookUp(1.f),
-	MouseAimTurn(0.2f),
-	MouseAimLookUp(0.2f),
-	//Rate when we dont aim
-	HipTurnAtRate(90.f),
-	HipLookUpAtRate(90.f),
-	//Rate when we aiming
-	AimTurnAtRate(20.f),
-	AimLookUpAtRate(20.f),
-	//Camera settings when we aiming
-	DefaultCameraFOV(0.f), //set in begin play
-	AimCameraFOV(40.f),
-	CurrentCameraFOV(0.f), //set in begin play
-	InterpZoomSpeed(20.f),
-	//Settings Crosshire
-	CrosshiresAimFactor(0.f),
-	CrosshiresIsInAirFactor(0.f),
-	CrosshiresMultiplier(0.f),
-	CrosshiresVelocityFactor(0.f),
-	CrosshiresShootingFactor(0.f),
-	//variables for count Agro item
-	bOverlapAgroItem(false),
-	AgroCountItem(0.f),
-	//properties for Items CameraLocation
-	CameraInterpDistance(250.f),
-	CameraInterpElevation(65.f),
-	//Combat Var
-	CombatState(ECombatState::ECS_Unoccupied)
+	Super (ObjInit.SetDefaultSubobjectClass<UShooterCharMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -75,11 +42,6 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjInit) :
 	bUseControllerRotationYaw = true;
 }
 
-//void AShooterCharacter::DisableCameraLag()
-//{
-//	CameraBoom->bEnableCameraLag = (false);
-//}
-
 // Called when the game starts or when spawned
 void AShooterCharacter::BeginPlay()
 {
@@ -91,14 +53,11 @@ void AShooterCharacter::BeginPlay()
 	check(CameraBoom);
 	check(WeaponComponent);
 
-	qweqwe = Cast<UShooterCharMovementComponent>(GetMovementComponent());
-
 	if (FollowCamera)
 	{
 		DefaultCameraFOV = FollowCamera->FieldOfView;
 		CurrentCameraFOV = DefaultCameraFOV;
 	}
-
 }
 
 // Called every frame
@@ -196,12 +155,8 @@ void AShooterCharacter::SelectButtonPressed()
 		auto Item = Cast<AItem>(TraceHitItem);
 		if (!Item) return;
 		Item->StartCurveItem(this);
-		//SwapWeapon(Weapon);
 		TraceHitItem = nullptr;
 		TraceHitItemLast = nullptr;
-
-		if (Item->GetPickupSound())
-		UGameplayStatics::PlaySound2D(this, Item->GetPickupSound());
 	}
 }
 
@@ -231,14 +186,22 @@ void AShooterCharacter::ToogleCrouch(bool CharacterIsCrouched)
 
 void AShooterCharacter::GetPickupItem(AItem* Item)
 {
-	AWeapon* Weapon = Cast<AWeapon>(Item);
-	if (Weapon)
-	{
-		if (Weapon->GetEquipSound())
-		UGameplayStatics::PlaySound2D(this, Weapon->GetEquipSound());
-
-		WeaponComponent->SwapWeapon(Weapon);
-	}
+	if (!Item) return;
+	Item->SetOwner(this);
+	Item->GetPickupItem();
+	//Item->GetPickupItem();
+	//AWeapon* Weapon = Cast<AWeapon>(Item);
+	//if (Weapon)
+	//{
+	//	UGameplayStatics::PlaySound2D(this, Weapon->GetEquipSound());
+	//	WeaponComponent->SwapWeapon(Weapon);
+	//	return;
+	//}
+	//AAmmo* Ammo = Cast<AAmmo>(Item);
+	//if(Ammo)
+	//{
+	//	Ammo->Pi
+	//}
 }
 
 bool AShooterCharacter::GetAimingCondition()

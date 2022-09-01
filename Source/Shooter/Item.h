@@ -55,7 +55,7 @@ protected://functions
 	void SetRare();
 
 	//Set properties item 
-	virtual void SetItemProperties(EItemStates State);
+	void SetItemProperties(EItemStates State);
 
 	//Call when TimerCurve finish //call when TimerCurve end / stop interp movement to camera char
 	void FinishInterpItem();
@@ -63,21 +63,17 @@ protected://functions
 	// Call if IsBeTaken true. after that start interp movement item
 	void ItemInterp(float DeltaTime);
 
-	//virtual UMeshComponent* GetMeshComponent() const { return ItemMesh; }
+	virtual UMeshComponent* GetMeshComponent() const { return ItemMesh; }
 
 private:// variables
 
 	//Name of specifically item
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	FString ItemName;
-
-	//Amount our ammo
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	int32 Amount;
+	FString ItemName = FString("Default");
 
 	//Rare Item
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	EItemRare ItemRare;
+	EItemRare ItemRare = EItemRare::EIR_Max;
 
 	//Count Stars
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
@@ -85,35 +81,35 @@ private:// variables
 
 	//StateItem
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	EItemStates ItemStates;
+	EItemStates ItemStates = EItemStates::EIS_Pickup;
 
 	//store make in editor curve for pickup item
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Curve", meta = (AllowPrivateAccess = "true"))
-	class UCurveFloat* ItemZCurve;
+	class UCurveFloat* ItemZCurve = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Curve", meta = (AllowPrivateAccess = "true"))
-	UCurveFloat* ItemScaleCurve;
+	UCurveFloat* ItemScaleCurve = nullptr;
 
 	//Store Timer for curve function
 	FTimerHandle TimerCurve;
 
 	//Time how long we will be interp Item
-	float InterpTimeCurve;
+	float InterpTimeCurve = 0.7f;
 	
 	//true when we start pickup item
-	bool IsBeTaken;
+	bool IsBeTaken = false;
 
 	//store intin location when we pickup item
-	FVector ItemStartCurveLocation;
+	FVector ItemStartCurveLocation = FVector::ZeroVector;
 
 	//store player camera location
-	FVector CameraPlayerLocation;
+	FVector CameraPlayerLocation = FVector::ZeroVector;
 
 	UPROPERTY()
-	class AShooterCharacter* Character;
+	class AShooterCharacter* Character = nullptr;
 
 	// variable for store initial rotation item when we start pickup interp
-	float InterpInitialYawOffset;
+	float InterpInitialYawOffset = 0.f;
 
 protected://variables
 
@@ -133,6 +129,10 @@ protected://variables
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Base Properties")
 	class USphereComponent* AgroSphere;
 
+	//Amount our ammo
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo", meta = (AllowPrivateAccess = "true"))
+	int32 AmmoAmount = 0.f;
+
 	/** Sound pickup current item */
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	class USoundCue* PickupSound;
@@ -140,6 +140,10 @@ protected://variables
 	/** Sound Equip current item */
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundCue* EquipSound;
+	
+	/** Set Pickup widget Icon*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget")
+	UTexture2D* WidgetIcon;
 
 public://functions
 
@@ -152,7 +156,6 @@ public://functions
 
 	FORCEINLINE USkeletalMeshComponent* GetSkeletalMeshComponent() const { return ItemMesh; }
 
-
 	//Set/get for State Item
 	FORCEINLINE EItemStates GetItemStates() const { return ItemStates; }
 	void SetItemStates(EItemStates State);
@@ -163,4 +166,8 @@ public://functions
 	//Get Sounds
 	FORCEINLINE USoundCue* GetPickupSound() const { return PickupSound; }
 	FORCEINLINE USoundCue* GetEquipSound() const { return EquipSound; }
+
+	FORCEINLINE int32 GetAmmoAmount() const { return AmmoAmount; }
+
+	virtual void GetPickupItem();
 };

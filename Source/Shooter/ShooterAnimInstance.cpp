@@ -7,25 +7,7 @@
 #include "Kismet/KismetMathLibrary.h"
 
 
-UShooterAnimInstance::UShooterAnimInstance():
-	ShooterCharacter(nullptr),
-	Speed(0.f),
-	bIsInAir(false),
-	bIsAcceleration(false),
-	MovementOffsetYaw(0.f),
-	LastMovementOffsetYaw(0.f),
-	bAiming(false),
-	bIsCrouch(false),
-	bCharacterIsReloading(false),
-	CharacterYaw(0.f),
-	LastCharacterYaw(0.f),
-	RootYawOffset(0.f),
-	ControllerPitch(0.f),
-	CharacterRotator(0.f),
-	LastCharacterRotator(0.f),
-	YawDelta(0.f),
-	BlendWeight(1.f),
-	bIsTurnInPlaceAnimPlaying(false)
+UShooterAnimInstance::UShooterAnimInstance()
 {
 }
 

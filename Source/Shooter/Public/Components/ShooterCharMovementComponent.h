@@ -21,7 +21,7 @@ public:
 private://variables
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Speed", meta = (AllowPrivateAccess = "true"))
-	float AimMultiplier;
+	float AimMultiplier = 0.5f;
 
 
 public://functions

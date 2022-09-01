@@ -2,19 +2,14 @@
 
 
 #include "Weapon.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
+#include "ShooterCharacter.h"
+#include "Components/WeaponComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogWeapon, All, All)
 
-AWeapon::AWeapon():
-TimeThrowWeapon (0.75),
-bWeaponFalling (false),
-MeshRotation(0.f),
-Ammo(30),
-MagazineCapacity(30),
-WeaponType(EWeaponType::EWT_SubmachineGun),
-AmmoType(EAmmoType::EAT_9MM),
-MontageWeaponName("Reload_SMG"),
-ClipBoneName("smg_clip")
+AWeapon::AWeapon()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -86,4 +81,14 @@ void AWeapon::StopFalling()
 
 	bWeaponFalling = false;
 	SetItemStates(EItemStates::EIS_Pickup);
+}
+
+void AWeapon::GetPickupItem()
+{
+	UGameplayStatics::PlaySound2D(this, GetEquipSound());
+	const auto Char = Cast<AShooterCharacter>(GetOwner());
+	if (!Char) return;
+	const auto Component = Cast<UWeaponComponent>(Char->GetComponentByClass(UWeaponComponent::StaticClass()));
+	if (!Component) return;
+	Component->SwapWeapon(this);
 }

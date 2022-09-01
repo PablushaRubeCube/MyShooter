@@ -20,7 +20,7 @@ public:
 private://variables
 
 	UPROPERTY()
-	class AShooterCharacter* CharOwner;
+	class AShooterCharacter* CharOwner = nullptr;
 
 	//Chose Weapon for Spawn
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
@@ -28,7 +28,7 @@ private://variables
 
 	//EquippedWeapon our Char
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	class AWeapon* EquippedWeapon;
+	class AWeapon* EquippedWeapon = nullptr;
 
 	// store Reload montage 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
@@ -36,19 +36,11 @@ private://variables
 
 	//HipValue to Lookup our char Gamepad
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	bool bAiming;
+	bool bAiming = false;
 
 	//Store Char Ammo
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	TMap<EAmmoType, int32> AmmoCharacter;
-
-	//Start int 9mm ammo
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
-	int32 Init9mmAmmo;
-
-	//Start int AR ammo
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
-	int32 InitARAmmo;
 
 	//sound cue for gun shots
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
@@ -72,16 +64,22 @@ private://variables
 
 	//Crosshair 
 	FTimerHandle CrosshiresTimer;
-	bool bShooting;
-	float CrosshiresDelayTimer;
+	bool bShooting = false;
+	float CrosshiresDelayTimer = 0.05f;
 
 	//Variables for AutoShooting
-	bool bFireButtonPressed;
-	bool bShouldFire;
-	float ShootingRate;
+	bool bFireButtonPressed = false;
+	bool bShouldFire = false;
+	float ShootingRate = 0.1f;
 	FTimerHandle ShootingTimer;
 
-	bool bIsWasAiming;
+	//Start int 9mm ammo
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	int32 Init9mmAmmo = 9;
+	//Start int AR ammo
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	int32 InitARAmmo = 30;
+	bool bIsWasAiming = false;
 
 private://functions
 
@@ -153,7 +151,7 @@ public:
 	// Called every frame
 	//virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-			//Return Aiming condition our char
+	//Return Aiming condition our char
 	bool GetAimingCondition();
 
 	//Swap Weapon
@@ -171,4 +169,6 @@ public:
 	void AimButtomReleased();
 
 	bool GetbShooting() const { return bShooting; }
+
+	void AddAmmo(class AAmmo* Ammo);
 };

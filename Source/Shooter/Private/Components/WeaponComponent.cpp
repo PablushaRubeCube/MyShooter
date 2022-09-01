@@ -11,19 +11,10 @@
 #include "Sound/SoundCue.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Particles/ParticleSystem.h"
+#include "Items/Ammo/Ammo.h"
 
 // Sets default values for this component's properties
-UWeaponComponent::UWeaponComponent() :
-	bShooting(false),
-	CrosshiresDelayTimer(0.05f),
-	//AutoShooting Valiables
-	bFireButtonPressed(false),
-	bShouldFire(true),
-	ShootingRate(0.1f),
-	//Start Ammo value
-	Init9mmAmmo(9),
-	InitARAmmo(30),
-	bIsWasAiming(false)
+UWeaponComponent::UWeaponComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -322,6 +313,14 @@ bool UWeaponComponent::IsCanAim()
 {
 	if (!CharOwner || CharOwner->GetECombatState() == ECombatState::ECS_Reloading) return false;
 	return true;
+}
+
+void UWeaponComponent::AddAmmo(class AAmmo* Ammo)
+{
+	if (!Ammo) return;
+	if (!AmmoCharacter.Contains(Ammo->GetAmmoType())) return;
+	const int32 CommonAmmo = AmmoCharacter[Ammo->GetAmmoType()] + Ammo->GetAmmoAmount();
+	AmmoCharacter.Add(Ammo->GetAmmoType(), CommonAmmo);
 }
 
 // Called when the game starts

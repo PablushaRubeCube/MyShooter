@@ -21,60 +21,60 @@ public:
 private://variables
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
-	class AShooterCharacter* ShooterCharacter;
+	class AShooterCharacter* ShooterCharacter = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	float Speed;
+	float Speed = 0.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	bool bIsInAir;
+	bool bIsInAir = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	bool bIsAcceleration;
+	bool bIsAcceleration = false;
 
 	//Offset yaw used for strafing
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	float MovementOffsetYaw;
+	float MovementOffsetYaw = 0.f;
 
 	//last offset yaw before we stop our char
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	float LastMovementOffsetYaw;
+	float LastMovementOffsetYaw = 0.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
-	bool bAiming;
+	bool bAiming = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Crouch", meta = (AllowPrivateAccess = "true"))
-	bool bIsCrouch;
+	bool bIsCrouch = false;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
-	bool bCharacterIsReloading;
+	bool bCharacterIsReloading = false;
 
-	float CharacterYaw;
+	float CharacterYaw = 0.f;
 
-	float LastCharacterYaw;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	float RootYawOffset;
+	float LastCharacterYaw = 0.f;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	float ControllerPitch;
+	float RootYawOffset = 0.f;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float ControllerPitch = 0.f;
 
 	/** Rotation curve value this frame*/
-	float RotationCurve;
+	float RotationCurve = 0.f;
 	/** Rotation curve value last frame*/
-	float LastRotationCurve;
+	float LastRotationCurve = 0.f;
 
-	FRotator CharacterRotator;
-	FRotator LastCharacterRotator;
+	FRotator CharacterRotator = FRotator::ZeroRotator;
+	FRotator LastCharacterRotator = FRotator::ZeroRotator;
 	UPROPERTY(BlueprintReadOnly, Category = "Lean", meta = (AllowPrivateAccess = "true"))
-	float YawDelta;
+	float YawDelta = 0.f;
 
 	/** Set Blend Weight to ShootAnimation*/
 	UPROPERTY(BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	float BlendWeight;
+	float BlendWeight = 1.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Crouch", meta = (AllowPrivateAccess = "true"))
-	bool bIsTurnInPlaceAnimPlaying;
+	bool bIsTurnInPlaceAnimPlaying = false;
 
 private://functions
 

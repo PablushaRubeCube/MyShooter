@@ -32,42 +32,44 @@ public:
 private://variables
 
 	FTimerHandle TimerThrowWeapon;
-	float TimeThrowWeapon;
-	bool bWeaponFalling;
-	FRotator MeshRotation;
+	float TimeThrowWeapon = 0.75f;
+	bool bWeaponFalling = false;
+	FRotator MeshRotation = FRotator::ZeroRotator;
 
 protected://variables
 
 	/**Store Ammo Value current Weapon*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
-	int32 Ammo;
+	int32 Ammo = 30.f;
 
 	/** Store Max Magazine Capacity*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
-	int32 MagazineCapacity;
+	int32 MagazineCapacity = 30.f;
 
 	//Store type of Weapon
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	EWeaponType WeaponType;
+	EWeaponType WeaponType = EWeaponType::EWT_SubmachineGun;
 
 	//Store Type of use Ammo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	EAmmoType AmmoType;
+	EAmmoType AmmoType = EAmmoType::EAT_9MM;
 
 	//Store anim montage Name current weapon
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	FName MontageWeaponName;
+	FName MontageWeaponName = "Reload_SMG";
 
 	// Store Clip weapon bone Name
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	FName ClipBoneName;
+	FName ClipBoneName = "smg_clip";
 
 	UPROPERTY(BlueprintReadOnly, Category = "Weapon")
-	bool IsClipTaked;
+	bool IsClipTaked = false;
 
 protected://functions
 
 	void StopFalling();
+
+	virtual void GetPickupItem() override;
 
 public:
 	/** Call when player Throw Weapon */

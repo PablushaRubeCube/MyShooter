@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "../Item.h"
+#include "../AmmoType.h"
 #include "Ammo.generated.h"
 
 /**
@@ -21,10 +22,26 @@ public:
 protected://variables
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	USphereComponent* PickupSphere;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	UStaticMeshComponent* AmmoMesh;
 
-protected://functions
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo")
+	EAmmoType AmmoType = EAmmoType::EAT_MAX;
 
-	//virtual void SetItemProperties(EItemStates State, UMeshComponent* Mesh);
+protected://functions
 	
+	virtual UMeshComponent* GetMeshComponent() const override { return AmmoMesh; }
+
+	virtual void GetPickupItem() override;
+
+	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnPickupSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+public://functions
+
+	FORCEINLINE EAmmoType GetAmmoType() const { return AmmoType; }
 };

@@ -7,19 +7,11 @@
 #include "Components/SphereComponent.h"
 #include "ShooterCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 // Sets default values
-AItem::AItem() :
-ItemName(FString("Default")),
-Amount(0.f),
-ItemRare(EItemRare::EIR_Max),
-ItemStates(EItemStates::EIS_Pickup),
-ItemZCurve(nullptr),
-ItemScaleCurve(nullptr),
-IsBeTaken(false),
-InterpTimeCurve(0.7f),
-Character(nullptr),
-InterpInitialYawOffset(0.f)
+AItem::AItem()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -37,7 +29,6 @@ InterpInitialYawOffset(0.f)
 
 	AgroSphere = CreateDefaultSubobject<USphereComponent>(TEXT("AgroSphere"));
 	AgroSphere->SetupAttachment(GetRootComponent());
-
 }
 
 // Called when the game starts or when spawned
@@ -137,6 +128,8 @@ void AItem::StartCurveItem(AShooterCharacter* Char)
 	Character = Char;
 	if (!Character) return;
 
+	UGameplayStatics::PlaySound2D(this, GetPickupSound());
+
 	IsBeTaken = true;
 	ItemStartCurveLocation = GetActorLocation();
 
@@ -151,6 +144,10 @@ void AItem::StartCurveItem(AShooterCharacter* Char)
 	InterpInitialYawOffset = InitialItemYaw - InitialCameraYaw;
 }
 
+void AItem::GetPickupItem()
+{
+}
+
 void AItem::SetItemProperties(EItemStates State)
 {
 	switch (State)
@@ -158,11 +155,11 @@ void AItem::SetItemProperties(EItemStates State)
 	case EItemStates::EIS_Equipped:
 		PickUpWidget->SetVisibility(false);
 		//set properties for Mesh Item
-		ItemMesh->SetSimulatePhysics(false);
-		ItemMesh->SetVisibility(true);
-		ItemMesh->SetEnableGravity(false);
-		ItemMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMeshComponent()->SetSimulatePhysics(false);
+		GetMeshComponent()->SetVisibility(true);
+		GetMeshComponent()->SetEnableGravity(false);
+		GetMeshComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		GetMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		//Set Collision properties for Sphere item
 		AgroSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		AgroSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -173,11 +170,11 @@ void AItem::SetItemProperties(EItemStates State)
 
 	case EItemStates::EIS_Pickup:
 		//set properties for Mesh Item
-		ItemMesh->SetSimulatePhysics(false);
-		ItemMesh->SetVisibility(true);
-		ItemMesh->SetEnableGravity(false);
-		ItemMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMeshComponent()->SetSimulatePhysics(false);
+		GetMeshComponent()->SetVisibility(true);
+		GetMeshComponent()->SetEnableGravity(false);
+		GetMeshComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		GetMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		//Set Collision properties for Sphere item
 		AgroSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 		AgroSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -190,11 +187,11 @@ void AItem::SetItemProperties(EItemStates State)
 	case EItemStates::EIS_EquipInterping:
 		PickUpWidget->SetVisibility(false);
 		//set properties for Mesh Item
-		ItemMesh->SetSimulatePhysics(false);
-		ItemMesh->SetVisibility(true);
-		ItemMesh->SetEnableGravity(false);
-		ItemMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMeshComponent()->SetSimulatePhysics(false);
+		GetMeshComponent()->SetVisibility(true);
+		GetMeshComponent()->SetEnableGravity(false);
+		GetMeshComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		GetMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		//Set Collision properties for Sphere item
 		AgroSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		AgroSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -208,12 +205,12 @@ void AItem::SetItemProperties(EItemStates State)
 
 	case EItemStates::EIS_Falling:
 		//set properties for Mesh Item
-		ItemMesh->SetSimulatePhysics(true);
-		ItemMesh->SetVisibility(true);
-		ItemMesh->SetEnableGravity(true);
-		ItemMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		ItemMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
-		ItemMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		GetMeshComponent()->SetSimulatePhysics(true);
+		GetMeshComponent()->SetVisibility(true);
+		GetMeshComponent()->SetEnableGravity(true);
+		GetMeshComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		GetMeshComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
+		GetMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		//Set Collision properties for Sphere item
 		AgroSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		AgroSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);

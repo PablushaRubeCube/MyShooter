@@ -28,10 +28,6 @@ public:
 
 private://functions
 
-//	void DisableCameraLag();
-
-	class UShooterCharMovementComponent* qweqwe;
-
 protected://functions
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -75,111 +71,101 @@ private://variables
 	//CameraComponent Attach to SpringArm socket
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	class UWeaponComponent* WeaponComponent;
 
+	//Default rate, overide this it tick function
 	//BaseValue to turn our char
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	float BaseTurnAtRate;
-
+	float BaseTurnAtRate = 100.f;
 	//BaseValue to Lookup our char
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	float BaseLookUpAtRate;
+	float BaseLookUpAtRate = 100.f;
 
+	//Mouse Sensetivity
 	//HipValue to turn our char Mouse
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
-		float MouseHipTurn;
-
+		float MouseHipTurn = 1.f;
 	//HipValue to Lookup our char Mouse
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
-		float MouseHipLookUp;
-
+		float MouseHipLookUp = 1.f;
 	//HipValue to turn our char Mouse
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
-		float MouseAimTurn;
-
+		float MouseAimTurn = 0.2f;
 	//HipValue to Lookup our char Mouse
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
-		float MouseAimLookUp;
+		float MouseAimLookUp = 0.2f;
 
+	//Rate when we dont aim
 	//HipValue to turn our char Gamepad
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	float HipTurnAtRate;
-
+	float HipTurnAtRate = 90.f;
 	//HipValue to Lookup our char Gamepad
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	float HipLookUpAtRate;
+	float HipLookUpAtRate = 90.f;
 
+	//Rate when we aiming
 	//HipValue to turn our char Gamepad
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	float AimTurnAtRate;
-
+	float AimTurnAtRate = 20.f;
 	//HipValue to Lookup our char Gamepad
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	float AimLookUpAtRate;
+	float AimLookUpAtRate = 20.f;
 
+	//Camera settings when we aiming
 	//fov for start
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	float DefaultCameraFOV;
-
+	float DefaultCameraFOV = 0.f; //set in begin play
 	//fov when we aim
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	float AimCameraFOV;
-
+	float AimCameraFOV = 40.f;
 	//camera at a specific time
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	float CurrentCameraFOV;
-
+	float CurrentCameraFOV = 0.f; //set in begin play
 	//speed of zoom camera
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	float InterpZoomSpeed;
+	float InterpZoomSpeed = 20.f;
 
 	//crosshires Lines
-
+	//Settings Crosshire
 	//Base crosshires value
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Crosshire, meta = (AllowPrivateAccess = "true"))
-	float CrosshiresMultiplier;
-
-	//crosshires value when we run
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Crosshire, meta = (AllowPrivateAccess = "true"))
-	float CrosshiresVelocityFactor;
-
-	//crosshires value when we Aim
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Crosshire, meta = (AllowPrivateAccess = "true"))
-	float  CrosshiresAimFactor;
-
+	float CrosshiresMultiplier = 0.f;
 	//crosshires value when we Jump
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Crosshire, meta = (AllowPrivateAccess = "true"))
-	float  CrosshiresIsInAirFactor;
-
+	float  CrosshiresIsInAirFactor = 0.f;
+	//crosshires value when we run
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Crosshire, meta = (AllowPrivateAccess = "true"))
+	float CrosshiresVelocityFactor = 0.f;
+	//crosshires value when we Aim
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Crosshire, meta = (AllowPrivateAccess = "true"))
+	float  CrosshiresAimFactor = 0.f;
 	//crosshires value when we shoot
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Crosshire, meta = (AllowPrivateAccess = "true"))
-	float  CrosshiresShootingFactor;
+	float  CrosshiresShootingFactor = 0.f;
 
+	//variables for count Agro item
 	//true if we overlap any ItemClass
-	bool bOverlapAgroItem;
-
+	bool bOverlapAgroItem = false;
 	//increment Count if we Overlap anyItemClass
-	int8 AgroCountItem;
+	int8 AgroCountItem = 0.f;
 
 	//Need for toogle display widget
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Items, meta = (AllowPrivateAccess = "true"))
 	class AItem* TraceHitItemLast;
-
 	//Ref To What we look right now
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	AItem* TraceHitItem;
 
+	//properties for Items CameraLocation
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Items, meta= (AllowPrivateAccess = "true"))
-	float CameraInterpDistance;
-
+	float CameraInterpDistance = 250.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Items, meta = (AllowPrivateAccess = "true"))
-	float CameraInterpElevation;
+	float CameraInterpElevation = 65.f;
 
 	/** Combat State, can only fire or reload */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	ECombatState CombatState;
+	ECombatState CombatState = ECombatState::ECS_Unoccupied;
 
 	//Clip Attach for this SceneComponent when we reload clip
 	UPROPERTY()
