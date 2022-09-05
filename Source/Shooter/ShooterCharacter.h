@@ -73,6 +73,8 @@ private://variables
 	class UCameraComponent* FollowCamera;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	class UWeaponComponent* WeaponComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Pickup, meta = (AllowPrivateAccess = "true"))
+	class UPickupComponent* PickupComponent;
 
 	//Default rate, overide this it tick function
 	//BaseValue to turn our char
@@ -171,6 +173,14 @@ private://variables
 	UPROPERTY()
 	USceneComponent* HandSceneComponent;
 
+protected://variables
+
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (MakeEditWidget = true))
+	TArray<FVector> PickupAmmoLocation;
+
+	int32 CurrentAmmoLocationIndex = 0;
+
 public://functions	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -201,4 +211,8 @@ public://functions
 	bool GetAimingCondition();
 
 	bool LineTracePickUp(FHitResult& PickUpitem, FVector& OutVector);
+
+	FVector GetInterpLocation(const AItem* Item);
+
+	int32 GetInterpIndexLocation();
 };

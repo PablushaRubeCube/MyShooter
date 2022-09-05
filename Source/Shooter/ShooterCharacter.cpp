@@ -11,6 +11,7 @@
 #include "Components/WidgetComponent.h"
 #include "Components/ShooterCharMovementComponent.h"
 #include "Components/WeaponComponent.h"
+#include "Components/PickupComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCharacter, All, All)
@@ -33,6 +34,8 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjInit) :
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 
 	WeaponComponent = CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComponent"));
+
+	PickupComponent = CreateDefaultSubobject <UPickupComponent>(TEXT("PickupComponent"));
 
 	HandSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("HandComponent"));
 
@@ -148,6 +151,29 @@ bool AShooterCharacter::LineTracePickUp(FHitResult& PickUpitem, FVector& OutVect
 	return false;
 }
 
+FVector AShooterCharacter::GetInterpLocation(const AItem* Item)
+{
+	const auto Ammo = Cast<AAmmo>(Item);
+	if (Ammo)
+	{
+		return FollowCamera->GetComponentLocation() += PickupAmmoLocation[Ammo->GetIndexInterpLocation()];
+	}
+	return GetCameraInterpLocation();
+}
+
+int32 AShooterCharacter::GetInterpIndexLocation()
+{
+	if (++CurrentAmmoLocationIndex < PickupAmmoLocation.Num())
+	{
+		return CurrentAmmoLocationIndex;
+	}
+	else
+	{
+		CurrentAmmoLocationIndex = 0;
+		return CurrentAmmoLocationIndex;
+	}
+}
+
 void AShooterCharacter::SelectButtonPressed()
 {
 	if (TraceHitItem)
@@ -173,13 +199,10 @@ void AShooterCharacter::ToogleCrouch(bool CharacterIsCrouched)
 {
 	if (CharacterIsCrouched)
 	{
-		FTimerHandle CameraLagTimerHandle;
-	//	GetWorldTimerManager().SetTimer(CameraLagTimerHandle, this, &AShooterCharacter::DisableCameraLag, 1.f);
 		UnCrouch();	
 	}
 	else
 	{
-		//CameraBoom->bEnableCameraLag = (true);
 		Crouch();
 	}	
 }
@@ -189,19 +212,6 @@ void AShooterCharacter::GetPickupItem(AItem* Item)
 	if (!Item) return;
 	Item->SetOwner(this);
 	Item->GetPickupItem();
-	//Item->GetPickupItem();
-	//AWeapon* Weapon = Cast<AWeapon>(Item);
-	//if (Weapon)
-	//{
-	//	UGameplayStatics::PlaySound2D(this, Weapon->GetEquipSound());
-	//	WeaponComponent->SwapWeapon(Weapon);
-	//	return;
-	//}
-	//AAmmo* Ammo = Cast<AAmmo>(Item);
-	//if(Ammo)
-	//{
-	//	Ammo->Pi
-	//}
 }
 
 bool AShooterCharacter::GetAimingCondition()

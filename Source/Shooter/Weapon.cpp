@@ -85,10 +85,10 @@ void AWeapon::StopFalling()
 
 void AWeapon::GetPickupItem()
 {
-	UGameplayStatics::PlaySound2D(this, GetEquipSound());
 	const auto Char = Cast<AShooterCharacter>(GetOwner());
 	if (!Char) return;
-	const auto Component = Cast<UWeaponComponent>(Char->GetComponentByClass(UWeaponComponent::StaticClass()));
-	if (!Component) return;
-	Component->SwapWeapon(this);
+	UGameplayStatics::PlaySound2D(this, GetEquipSound());
+	const auto WeaponComponent = Cast<UWeaponComponent>(Char->GetComponentByClass(UWeaponComponent::StaticClass()));
+	if (!WeaponComponent) return;
+	WeaponComponent->SwapWeapon(this);
 }

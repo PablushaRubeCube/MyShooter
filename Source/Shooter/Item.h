@@ -41,61 +41,37 @@ public:
 	// Sets default values for this actor's properties
 	AItem();
 
-protected://functions
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	//Overlap agro Function
-	UFUNCTION()
-	void BeginOverlapAgroSphere(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UFUNCTION()
-	void EndOverlapAgroSphere(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	//change ActiveStars depending on ItemRare
-	void SetRare();
-
-	//Set properties item 
-	void SetItemProperties(EItemStates State);
-
-	//Call when TimerCurve finish //call when TimerCurve end / stop interp movement to camera char
-	void FinishInterpItem();
-
-	// Call if IsBeTaken true. after that start interp movement item
-	void ItemInterp(float DeltaTime);
-
-	virtual UMeshComponent* GetMeshComponent() const { return ItemMesh; }
-
 private:// variables
 
 	//Name of specifically item
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	FString ItemName = FString("Default");
+		FString ItemName = FString("Default");
 
 	//Rare Item
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	EItemRare ItemRare = EItemRare::EIR_Max;
+		EItemRare ItemRare = EItemRare::EIR_Max;
 
 	//Count Stars
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	TArray<bool> ActiveStars;
+		TArray<bool> ActiveStars;
 
 	//StateItem
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	EItemStates ItemStates = EItemStates::EIS_Pickup;
+		EItemStates ItemStates = EItemStates::EIS_Pickup;
 
 	//store make in editor curve for pickup item
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Curve", meta = (AllowPrivateAccess = "true"))
-	class UCurveFloat* ItemZCurve = nullptr;
+		class UCurveFloat* ItemZCurve = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Curve", meta = (AllowPrivateAccess = "true"))
-	UCurveFloat* ItemScaleCurve = nullptr;
+		UCurveFloat* ItemScaleCurve = nullptr;
 
 	//Store Timer for curve function
 	FTimerHandle TimerCurve;
 
 	//Time how long we will be interp Item
 	float InterpTimeCurve = 0.7f;
-	
+
 	//true when we start pickup item
 	bool IsBeTaken = false;
 
@@ -106,10 +82,14 @@ private:// variables
 	FVector CameraPlayerLocation = FVector::ZeroVector;
 
 	UPROPERTY()
-	class AShooterCharacter* Character = nullptr;
+		class AShooterCharacter* Character = nullptr;
 
 	// variable for store initial rotation item when we start pickup interp
 	float InterpInitialYawOffset = 0.f;
+
+private://functions
+
+	void PlayPickupSound(AShooterCharacter* Char);
 
 protected://variables
 
@@ -145,6 +125,30 @@ protected://variables
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget")
 	UTexture2D* WidgetIcon;
 
+protected://functions
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	//Overlap agro Function
+	UFUNCTION()
+		void BeginOverlapAgroSphere(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+		void EndOverlapAgroSphere(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	//change ActiveStars depending on ItemRare
+	void SetRare();
+
+	//Set properties item 
+	void SetItemProperties(EItemStates State);
+
+	//Call when TimerCurve finish //call when TimerCurve end / stop interp movement to camera char
+	void FinishInterpItem();
+
+	// Call if IsBeTaken true. after that start interp movement item
+	void ItemInterp(float DeltaTime);
+
+	virtual UMeshComponent* GetMeshComponent() const { return ItemMesh; }
+
 public://functions
 
 	virtual void Tick(float DeltaTime) override;
@@ -161,7 +165,7 @@ public://functions
 	void SetItemStates(EItemStates State);
 
 	//Char call when start pickup item
-	void StartCurveItem(AShooterCharacter* Char);
+	virtual	void StartCurveItem(AShooterCharacter* Char);
 
 	//Get Sounds
 	FORCEINLINE USoundCue* GetPickupSound() const { return PickupSound; }

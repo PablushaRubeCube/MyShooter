@@ -45,6 +45,13 @@ void AAmmo::OnPickupSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 	PickupSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+void AAmmo::StartCurveItem(AShooterCharacter* Char)
+{
+	Super::StartCurveItem(Char);
+
+	IndexInterpLocation = Char->GetInterpIndexLocation();
+}
+
 
 //void AAmmo::SetItemProperties(EItemStates State, UMeshComponent* Mesh)
 //{

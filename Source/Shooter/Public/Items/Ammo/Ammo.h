@@ -30,6 +30,8 @@ protected://variables
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo")
 	EAmmoType AmmoType = EAmmoType::EAT_MAX;
 
+	int32 IndexInterpLocation = 0;
+
 protected://functions
 	
 	virtual UMeshComponent* GetMeshComponent() const override { return AmmoMesh; }
@@ -41,7 +43,14 @@ protected://functions
 	UFUNCTION()
 	void OnPickupSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+
+
 public://functions
 
 	FORCEINLINE EAmmoType GetAmmoType() const { return AmmoType; }
+
+	FORCEINLINE int32 GetIndexInterpLocation() const { return IndexInterpLocation; }
+
+	//Char call when start pickup item
+	virtual	void StartCurveItem(AShooterCharacter* Char) override;
 };

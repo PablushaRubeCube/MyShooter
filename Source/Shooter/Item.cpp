@@ -5,6 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Components/SphereComponent.h"
+#include "Components/PickupComponent.h"
 #include "ShooterCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -42,6 +43,13 @@ void AItem::BeginPlay()
 	
 	SetRare();
 	SetItemProperties(ItemStates);
+}
+
+void AItem::PlayPickupSound(AShooterCharacter* Char)
+{
+	const auto PickupComponent = Cast<UPickupComponent>(Char->GetComponentByClass(UPickupComponent::StaticClass()));
+	if (PickupComponent->GetbCanPlayPickupSound()) { UGameplayStatics::PlaySound2D(this, GetPickupSound()); }
+	PickupComponent->HoldPickupSound();
 }
 
 void AItem::BeginOverlapAgroSphere(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -125,11 +133,9 @@ void AItem::SetItemStates(EItemStates State)
 
 void AItem::StartCurveItem(AShooterCharacter* Char)
 {
+	if (!Char) return;
 	Character = Char;
-	if (!Character) return;
-
-	UGameplayStatics::PlaySound2D(this, GetPickupSound());
-
+	PlayPickupSound(Char);
 	IsBeTaken = true;
 	ItemStartCurveLocation = GetActorLocation();
 
@@ -137,10 +143,8 @@ void AItem::StartCurveItem(AShooterCharacter* Char)
 
 	GetWorldTimerManager().SetTimer(TimerCurve, this, &AItem::FinishInterpItem, InterpTimeCurve);
 
-	const float InitialCameraYaw = Character->GetFollowCamera()->GetComponentRotation().Yaw;
-
+	const float InitialCameraYaw = Char->GetFollowCamera()->GetComponentRotation().Yaw;
 	const float InitialItemYaw = GetActorRotation().Yaw;
-
 	InterpInitialYawOffset = InitialItemYaw - InitialCameraYaw;
 }
 
@@ -243,13 +247,13 @@ void AItem::ItemInterp(float DeltaTime)
 {
 	if(!IsBeTaken || !Character || !ItemZCurve) return;
 
-	//get start and target loacation
-	FVector ItemLocation = ItemStartCurveLocation;
-	const FVector CameraLocation = Character->GetCameraInterpLocation();
+	//get start/target locations
+	const FVector StartLocation = ItemStartCurveLocation;
+	const FVector FinishLocation = Character->GetInterpLocation(this);
 
-	//get z size between camera and item
-	const FVector ItemToCameraLocation = FVector {0.f, 0.f, (CameraLocation - ItemLocation).Z};
-	const float DeltaZ = ItemToCameraLocation.Size();
+	//get z size between finish and start location
+	const FVector StartToFinishLocation = FVector {0.f, 0.f, (FinishLocation - StartLocation).Z};
+	const float DeltaZ = StartToFinishLocation.Size();
 
 	//Get current value CurveZ when timer elapsed
 	const float CurrentElapsedTime = GetWorldTimerManager().GetTimerElapsed(TimerCurve);
@@ -257,22 +261,17 @@ void AItem::ItemInterp(float DeltaTime)
 
 	//get current actor location
 	const FVector CurrentItemLocation = { GetActorLocation() };
-
 	//interp X Y item location
-	const float InterpXItemLocation = FMath::FInterpTo(CurrentItemLocation.X, CameraLocation.X, DeltaTime, 30.f);
-	const float InterpYItemLocation = FMath::FInterpTo(CurrentItemLocation.Y, CameraLocation.Y, DeltaTime, 30.f);
+	const float InterpXItemLocation = FMath::FInterpTo(CurrentItemLocation.X, FinishLocation.X, DeltaTime, 30.f);
+	const float InterpYItemLocation = FMath::FInterpTo(CurrentItemLocation.Y, FinishLocation.Y, DeltaTime, 30.f);
 	
 	//Set XYZ Item location every tick 
-	ItemLocation.X = InterpXItemLocation;
-	ItemLocation.Y = InterpYItemLocation;
-	ItemLocation.Z += CurrentCurveZ * DeltaZ;
-
-	SetActorLocation(ItemLocation, false, nullptr, ETeleportType::TeleportPhysics);
+	const FVector TickLocation = FVector(InterpXItemLocation, InterpYItemLocation, CurrentCurveZ * DeltaZ);
+	SetActorLocation(TickLocation, false, nullptr, ETeleportType::TeleportPhysics);
 
 	//Set Item Rotation when we interp
 	const FRotator CurrentCameraRotaion = Character->GetFollowCamera()->GetComponentRotation();
 	const FRotator ItemRotation{ 0.f, CurrentCameraRotaion.Yaw + InterpInitialYawOffset, 0.f };
-
 	SetActorRotation(ItemRotation, ETeleportType::TeleportPhysics);
 
 	if (ItemScaleCurve)

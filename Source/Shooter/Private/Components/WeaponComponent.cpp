@@ -160,10 +160,7 @@ bool UWeaponComponent::IsAmmoEmpty()
 void UWeaponComponent::PlayFireSound()
 {
 	//play fire sound
-	if (FireShotSound)
-	{
-		UGameplayStatics::PlaySound2D(this, FireShotSound);
-	}
+	UGameplayStatics::PlaySound2D(this, FireShotSound);
 }
 
 void UWeaponComponent::SendBullet()
