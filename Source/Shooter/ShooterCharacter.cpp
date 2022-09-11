@@ -3,11 +3,11 @@
 
 #include "ShooterCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Camera/CameraComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Item.h"
 #include "Weapon.h"
 #include "Items/Ammo/Ammo.h"
+#include "Components/ShooterCharacterCameraComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Components/ShooterCharMovementComponent.h"
 #include "Components/WeaponComponent.h"
@@ -30,7 +30,7 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjInit) :
 	CameraBoom->bUsePawnControlRotation = true;// Rotate arm based on the controller
 	CameraBoom->SocketOffset = FVector (0.f, 50.f, 70.f);
 
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
+	FollowCamera = CreateDefaultSubobject<UShooterCharacterCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 
 	WeaponComponent = CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComponent"));
@@ -67,6 +67,9 @@ void AShooterCharacter::BeginPlay()
 void AShooterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	FVector Vector = (FollowCamera->GetComponentLocation() + (FollowCamera->GetForwardVector() * FollowCamera->PickupAmmoLocation[0]));
+	UE_LOG(LogCharacter, Display, TEXT("The vector value is: %s"), *Vector.ToString());
 
 	//Handle Interp Zoom when we aim
 	InterpZoomFOV(DeltaTime);
@@ -156,14 +159,16 @@ FVector AShooterCharacter::GetInterpLocation(const AItem* Item)
 	const auto Ammo = Cast<AAmmo>(Item);
 	if (Ammo)
 	{
-		return FollowCamera->GetComponentLocation() += PickupAmmoLocation[Ammo->GetIndexInterpLocation()];
+		const FVector CameraLocation{ FollowCamera->GetComponentLocation() };
+		const FVector CameraForwardLocation{ FollowCamera->GetForwardVector() };
+		return CameraLocation + (CameraForwardLocation * FollowCamera->PickupAmmoLocation[Ammo->GetIndexInterpLocation()]);
 	}
 	return GetCameraInterpLocation();
 }
 
 int32 AShooterCharacter::GetInterpIndexLocation()
 {
-	if (++CurrentAmmoLocationIndex < PickupAmmoLocation.Num())
+	if (++CurrentAmmoLocationIndex < FollowCamera->PickupAmmoLocation.Num())
 	{
 		return CurrentAmmoLocationIndex;
 	}

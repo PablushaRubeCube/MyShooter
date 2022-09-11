@@ -7,7 +7,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/PickupComponent.h"
 #include "ShooterCharacter.h"
-#include "Camera/CameraComponent.h"
+#include "Components/ShooterCharacterCameraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 

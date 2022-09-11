@@ -70,7 +70,7 @@ private://variables
 	class USpringArmComponent* CameraBoom;
 	//CameraComponent Attach to SpringArm socket
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FollowCamera;
+	class UShooterCharacterCameraComponent* FollowCamera;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	class UWeaponComponent* WeaponComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Pickup, meta = (AllowPrivateAccess = "true"))
@@ -175,10 +175,6 @@ private://variables
 
 protected://variables
 
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (MakeEditWidget = true))
-	TArray<FVector> PickupAmmoLocation;
-
 	int32 CurrentAmmoLocationIndex = 0;
 
 public://functions	
@@ -192,7 +188,7 @@ public://functions
 	FORCEINLINE  USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 	//Return CameraComponent subobject
-	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	FORCEINLINE UShooterCharacterCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	//Return HandComponent for clip reload function
 	UFUNCTION(BlueprintPure)
