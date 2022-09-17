@@ -10,6 +10,9 @@
 #include "Components/ShooterCharacterCameraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+#include "Curves/CurveVector.h"
+
+DEFINE_LOG_CATEGORY_STATIC(ItemLog, All, All)
 
 // Sets default values
 AItem::AItem()
@@ -30,6 +33,8 @@ AItem::AItem()
 
 	AgroSphere = CreateDefaultSubobject<USphereComponent>(TEXT("AgroSphere"));
 	AgroSphere->SetupAttachment(GetRootComponent());
+
+	
 }
 
 // Called when the game starts or when spawned
@@ -43,6 +48,16 @@ void AItem::BeginPlay()
 	
 	SetRare();
 	SetItemProperties(ItemStates);
+	//ToggleCustomDepth(false);
+}
+
+void AItem::OnConstruction(const FTransform& Transform)
+{
+	if (MeshMaterial)
+	{
+		MeshMaterialDynamic = UMaterialInstanceDynamic::Create(MeshMaterial, this);
+		GetMeshComponent()->SetMaterial(MaterialIndex, MeshMaterialDynamic);
+	}
 }
 
 void AItem::PlayPickupSound(AShooterCharacter* Char)
@@ -50,6 +65,45 @@ void AItem::PlayPickupSound(AShooterCharacter* Char)
 	const auto PickupComponent = Cast<UPickupComponent>(Char->GetComponentByClass(UPickupComponent::StaticClass()));
 	if (PickupComponent->GetbCanPlayPickupSound()) { UGameplayStatics::PlaySound2D(this, GetPickupSound()); }
 	PickupComponent->HoldPickupSound();
+}
+
+void AItem::StartTimerGlowMaterial()
+{
+	if (GetItemStates() != EItemStates::EIS_Pickup) return;
+	GetWorldTimerManager().SetTimer(GlowMaterial.TimerGlowMaterial,this, &AItem::StartTimerGlowMaterial, GlowMaterial.TimeGlowMaterial);
+}
+
+void AItem::UpdateGlowMaterial()
+{
+	if(!MeshMaterialDynamic) return;
+	float ElapsedTime;
+	FVector CurveVector;
+	switch (GetItemStates())
+	{
+	case EItemStates::EIS_Equipped:
+		break;
+	case EItemStates::EIS_Pickup:
+		if (!GlowMaterial.MaterialCurve) break;
+		ElapsedTime = GetWorldTimerManager().GetTimerElapsed(GlowMaterial.TimerGlowMaterial);
+		CurveVector = GlowMaterial.MaterialCurve->GetVectorValue(ElapsedTime);
+		break;
+	case EItemStates::EIS_EquipInterping:
+		if (!GlowMaterial.InterpItemCurve) break;
+		ElapsedTime = GetWorldTimerManager().GetTimerElapsed(TimerInterpCurve);
+		CurveVector = GlowMaterial.InterpItemCurve->GetVectorValue(ElapsedTime);
+		break;
+	case EItemStates::EIS_PickedUp:
+		break;
+	case EItemStates::EIS_Falling:
+		break;
+	case EItemStates::EIS_Max:
+		break;
+	default:
+		break;
+	}
+	MeshMaterialDynamic->SetScalarParameterValue(TEXT("FresnelMultiplay"), CurveVector.X * GlowMaterial.FresnelMultiplay);
+	MeshMaterialDynamic->SetScalarParameterValue(TEXT("ExponentFresnel"), CurveVector.Y * GlowMaterial.ExponentFresnel);
+	MeshMaterialDynamic->SetScalarParameterValue(TEXT("FresnelFraction"), CurveVector.Z * GlowMaterial.FresnelFraction);
 }
 
 void AItem::BeginOverlapAgroSphere(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -60,6 +114,7 @@ void AItem::BeginOverlapAgroSphere(UPrimitiveComponent* OverlappedComponent, AAc
 		if (Char)
 		{
 			Char->IncrementAgroCountItem(1);
+			ToggleCustomDepth(true);
 		}
 	}	
 }
@@ -72,6 +127,7 @@ void AItem::EndOverlapAgroSphere(UPrimitiveComponent* OverlappedComponent, AActo
 		if (Char)
 		{
 			Char->IncrementAgroCountItem(-1);
+			ToggleCustomDepth(false);
 		}
 	}
 }
@@ -82,6 +138,7 @@ void AItem::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	ItemInterp(DeltaTime);
+	UpdateGlowMaterial();
 }
 
 void AItem::SetRare()
@@ -131,7 +188,7 @@ void AItem::SetItemStates(EItemStates State)
 	SetItemProperties(State);
 }
 
-void AItem::StartCurveItem(AShooterCharacter* Char)
+void AItem::StartPickupItem(AShooterCharacter* Char)
 {
 	if (!Char) return;
 	Character = Char;
@@ -140,8 +197,8 @@ void AItem::StartCurveItem(AShooterCharacter* Char)
 	ItemStartCurveLocation = GetActorLocation();
 
 	SetItemStates(EItemStates::EIS_EquipInterping);
-
-	GetWorldTimerManager().SetTimer(TimerCurve, this, &AItem::FinishInterpItem, InterpTimeCurve);
+	//ToggleCustomDepth(true);
+	GetWorldTimerManager().SetTimer(TimerInterpCurve, this, &AItem::FinishInterpItem, InterpTimeCurve);
 
 	const float InitialCameraYaw = Char->GetFollowCamera()->GetComponentRotation().Yaw;
 	const float InitialItemYaw = GetActorRotation().Yaw;
@@ -170,6 +227,9 @@ void AItem::SetItemProperties(EItemStates State)
 		//SetCollision properties for CollisionBox
 		CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		//effects
+		ToggleCustomDepth(false);
+		ToggleGlowMaterial(false);
 		break;
 
 	case EItemStates::EIS_Pickup:
@@ -186,6 +246,10 @@ void AItem::SetItemProperties(EItemStates State)
 		CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 		CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		//effects
+		ToggleCustomDepth(false);
+		ToggleGlowMaterial(true);
+		StartTimerGlowMaterial();
 		break;
 
 	case EItemStates::EIS_EquipInterping:
@@ -202,6 +266,9 @@ void AItem::SetItemProperties(EItemStates State)
 		//SetCollision properties for CollisionBox
 		CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		//effects
+		ToggleCustomDepth(true);
+		ToggleGlowMaterial(true);
 		break;
 
 	case EItemStates::EIS_PickedUp:
@@ -221,6 +288,9 @@ void AItem::SetItemProperties(EItemStates State)
 		//SetCollision properties for CollisionBox
 		CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		//effects
+		ToggleCustomDepth(true);
+		ToggleGlowMaterial(true);
 		break;
 
 	case EItemStates::EIS_Max:
@@ -240,6 +310,9 @@ void AItem::FinishInterpItem()
 		Character->GetPickupItem(this);
 	}
 	SetActorScale3D(FVector(1.f));
+	//ToggleCustomDepth(false);
+	//ToggleGlowMaterial(false);
+	//ToggleCustomDepth(false);
 }
 
 
@@ -256,7 +329,7 @@ void AItem::ItemInterp(float DeltaTime)
 	const float DeltaZ = StartToFinishLocation.Size();
 
 	//Get current value CurveZ when timer elapsed
-	const float CurrentElapsedTime = GetWorldTimerManager().GetTimerElapsed(TimerCurve);
+	const float CurrentElapsedTime = GetWorldTimerManager().GetTimerElapsed(TimerInterpCurve);
 	const float CurrentCurveZ = ItemZCurve->GetFloatValue(CurrentElapsedTime);
 
 	//get current actor location
@@ -278,5 +351,18 @@ void AItem::ItemInterp(float DeltaTime)
 	{
 		const float ScaleCurveValue = ItemScaleCurve->GetFloatValue(CurrentElapsedTime);
 		SetActorScale3D(FVector(ScaleCurveValue));
+	}
+}
+
+void AItem::ToggleCustomDepth(bool bEnableCustomDepth)
+{
+	GetMeshComponent()->SetRenderCustomDepth(bEnableCustomDepth);
+}
+
+void AItem::ToggleGlowMaterial(bool bEnableGlowMaterial)
+{
+	if (MeshMaterialDynamic)
+	{
+		MeshMaterialDynamic->SetScalarParameterValue(TEXT("AlphaBlend"), !bEnableGlowMaterial);
 	}
 }

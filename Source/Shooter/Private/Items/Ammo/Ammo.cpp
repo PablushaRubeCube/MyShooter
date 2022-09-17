@@ -41,13 +41,13 @@ void AAmmo::OnPickupSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 {
 	const auto Char = Cast<AShooterCharacter>(OtherActor);
 	if (!Char) return;
-	StartCurveItem(Char);
+	StartPickupItem(Char);
 	PickupSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-void AAmmo::StartCurveItem(AShooterCharacter* Char)
+void AAmmo::StartPickupItem(AShooterCharacter* Char)
 {
-	Super::StartCurveItem(Char);
+	Super::StartPickupItem(Char);
 
 	IndexInterpLocation = Char->GetInterpIndexLocation();
 }

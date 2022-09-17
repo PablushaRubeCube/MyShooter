@@ -68,8 +68,8 @@ void AShooterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	FVector Vector = (FollowCamera->GetComponentLocation() + (FollowCamera->GetForwardVector() * FollowCamera->PickupAmmoLocation[0]));
-	UE_LOG(LogCharacter, Display, TEXT("The vector value is: %s"), *Vector.ToString());
+//	FVector Vector = (FollowCamera->GetComponentLocation() + (FollowCamera->GetForwardVector() * FollowCamera->PickupAmmoLocation[0]));
+//	UE_LOG(LogCharacter, Display, TEXT("The vector value is: %s"), *Vector.ToString());
 
 	//Handle Interp Zoom when we aim
 	InterpZoomFOV(DeltaTime);
@@ -101,9 +101,7 @@ void AShooterCharacter::DisplayWidget()
 			{
 				if (TraceHitItemLast != TraceHitItem)
 				{
-					//UE_LOG(LogTemp, Warning, TEXT("TET"));
-					//if lastFrame diffirent  Item
-					//or lastFrame null
+					//if lastFrame diffirent  Item//or lastFrame null
 					TraceHitItemLast->GetPickUpWidget()->SetVisibility(false);
 				}
 			}
@@ -185,7 +183,7 @@ void AShooterCharacter::SelectButtonPressed()
 	{
 		auto Item = Cast<AItem>(TraceHitItem);
 		if (!Item) return;
-		Item->StartCurveItem(this);
+		Item->StartPickupItem(this);
 		TraceHitItem = nullptr;
 		TraceHitItemLast = nullptr;
 	}

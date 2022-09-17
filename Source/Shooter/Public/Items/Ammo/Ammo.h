@@ -52,5 +52,5 @@ public://functions
 	FORCEINLINE int32 GetIndexInterpLocation() const { return IndexInterpLocation; }
 
 	//Char call when start pickup item
-	virtual	void StartCurveItem(AShooterCharacter* Char) override;
+	virtual	void StartPickupItem(AShooterCharacter* Char) override;
 };

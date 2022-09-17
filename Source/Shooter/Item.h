@@ -31,6 +31,32 @@ enum class EItemStates : uint8
 
 };
 
+USTRUCT(BlueprintType)
+struct FGlowMaterial
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	class UCurveVector* MaterialCurve;
+
+	UPROPERTY(EditAnywhere)
+	UCurveVector* InterpItemCurve;
+
+	FTimerHandle TimerGlowMaterial;
+
+	UPROPERTY(EditAnywhere)
+	float TimeGlowMaterial = 5.f;
+
+	UPROPERTY(EditAnywhere)
+	float FresnelMultiplay = 150.f;
+
+	UPROPERTY(EditAnywhere)
+	float ExponentFresnel = 3.f;
+
+	UPROPERTY(EditAnywhere)
+	float FresnelFraction = 4.f;
+};
+
 
 UCLASS()
 class SHOOTER_API AItem : public AActor
@@ -45,29 +71,29 @@ private:// variables
 
 	//Name of specifically item
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-		FString ItemName = FString("Default");
+	FString ItemName = FString("Default");
 
 	//Rare Item
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-		EItemRare ItemRare = EItemRare::EIR_Max;
+	EItemRare ItemRare = EItemRare::EIR_Max;
 
 	//Count Stars
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-		TArray<bool> ActiveStars;
+	TArray<bool> ActiveStars;
 
 	//StateItem
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-		EItemStates ItemStates = EItemStates::EIS_Pickup;
+	EItemStates ItemStates = EItemStates::EIS_Pickup;
 
 	//store make in editor curve for pickup item
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Curve", meta = (AllowPrivateAccess = "true"))
-		class UCurveFloat* ItemZCurve = nullptr;
+	class UCurveFloat* ItemZCurve = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Curve", meta = (AllowPrivateAccess = "true"))
-		UCurveFloat* ItemScaleCurve = nullptr;
+	UCurveFloat* ItemScaleCurve = nullptr;
 
 	//Store Timer for curve function
-	FTimerHandle TimerCurve;
+	FTimerHandle TimerInterpCurve;
 
 	//Time how long we will be interp Item
 	float InterpTimeCurve = 0.7f;
@@ -82,7 +108,7 @@ private:// variables
 	FVector CameraPlayerLocation = FVector::ZeroVector;
 
 	UPROPERTY()
-		class AShooterCharacter* Character = nullptr;
+	class AShooterCharacter* Character = nullptr;
 
 	// variable for store initial rotation item when we start pickup interp
 	float InterpInitialYawOffset = 0.f;
@@ -90,6 +116,10 @@ private:// variables
 private://functions
 
 	void PlayPickupSound(AShooterCharacter* Char);
+
+	void StartTimerGlowMaterial();
+
+	void UpdateGlowMaterial();
 
 protected://variables
 
@@ -125,9 +155,26 @@ protected://variables
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget")
 	UTexture2D* WidgetIcon;
 
+	/** Set Material for the Mesh */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Material")
+	UMaterialInstance* MeshMaterial;
+
+	/** Store Material index for dynamic changes */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Material")
+	int32 MaterialIndex = 0;
+
+	//Store Glow material for gun
+	UPROPERTY()
+	UMaterialInstanceDynamic* MeshMaterialDynamic;
+
+	UPROPERTY(EditAnywhere, Category = "Material")
+	FGlowMaterial GlowMaterial;
+
 protected://functions
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 	//Overlap agro Function
 	UFUNCTION()
@@ -149,6 +196,10 @@ protected://functions
 
 	virtual UMeshComponent* GetMeshComponent() const { return ItemMesh; }
 
+	void ToggleCustomDepth(bool bEnableCustomDepth);
+
+	void ToggleGlowMaterial(bool bEnableGlowMaterial);
+
 public://functions
 
 	virtual void Tick(float DeltaTime) override;
@@ -165,7 +216,7 @@ public://functions
 	void SetItemStates(EItemStates State);
 
 	//Char call when start pickup item
-	virtual	void StartCurveItem(AShooterCharacter* Char);
+	virtual	void StartPickupItem(AShooterCharacter* Char);
 
 	//Get Sounds
 	FORCEINLINE USoundCue* GetPickupSound() const { return PickupSound; }
