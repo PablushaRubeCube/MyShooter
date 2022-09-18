@@ -155,7 +155,7 @@ public:
 	bool GetAimingCondition();
 
 	//Swap Weapon
-	void SwapWeapon(AWeapon* SwapWeapon);
+	void PickupWeapon(AWeapon* Weapon);
 
 	/** Call when we press the button*/
 	void ReloadButtonPressed();
@@ -171,4 +171,5 @@ public:
 	bool GetbShooting() const { return bShooting; }
 
 	void AddAmmo(class AAmmo* Ammo);
+
 };

@@ -66,15 +66,17 @@ protected://functions
 private://variables
 
 	//Camera boom positioning the camera behind the character
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 	//CameraComponent Attach to SpringArm socket
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
 	class UShooterCharacterCameraComponent* FollowCamera;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
 	class UWeaponComponent* WeaponComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Pickup, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
 	class UPickupComponent* PickupComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
+	class UInventoryComponent*  InventoryComponent;
 
 	//Default rate, overide this it tick function
 	//BaseValue to turn our char
@@ -185,10 +187,10 @@ public://functions
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	//Returns CameraBoom subobject
-	FORCEINLINE  USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	//FORCEINLINE  USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 	//Return CameraComponent subobject
-	FORCEINLINE UShooterCharacterCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	//FORCEINLINE UShooterCharacterCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	//Return HandComponent for clip reload function
 	UFUNCTION(BlueprintPure)

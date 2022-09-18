@@ -65,6 +65,8 @@ protected://variables
 	UPROPERTY(BlueprintReadOnly, Category = "Weapon")
 	bool IsClipTaked = false;
 
+	int32 SlotNumber;
+
 protected://functions
 
 	void StopFalling();

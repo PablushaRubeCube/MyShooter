@@ -2,10 +2,11 @@
 
 
 #include "Components/WeaponComponent.h"
-#include "../ShooterCharacter.h"
-#include "../Weapon.h"
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
+#include "Components/InventoryComponent.h"
+#include "../ShooterCharacter.h"
+#include "../Weapon.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
@@ -104,6 +105,10 @@ AWeapon* UWeaponComponent::SpawnDefaultWeapon()
 	if (DefaultWeapon) //if we have one
 	{
 		AWeapon* SpawnedWeapon = GetWorld()->SpawnActor<AWeapon>(DefaultWeapon);//spawn weapon what we chose
+		if (!CharOwner) return nullptr;
+		const auto InventoryComponent = Cast<UInventoryComponent>(CharOwner->GetComponentByClass(UInventoryComponent::StaticClass()));
+		if (!InventoryComponent) return nullptr;
+		InventoryComponent->AddWeaponToList(SpawnedWeapon);
 		return SpawnedWeapon;
 	}
 	return nullptr;
@@ -138,10 +143,14 @@ void UWeaponComponent::DropWeapon()
 	}
 }
 
-void UWeaponComponent::SwapWeapon(AWeapon* SwapWeapon)
+void UWeaponComponent::PickupWeapon(AWeapon* Weapon)
 {
+	if (!CharOwner) return;
+	const auto InventoryComponent = Cast<UInventoryComponent>(CharOwner->GetComponentByClass(UInventoryComponent::StaticClass()));
+	if (!InventoryComponent) return;
+	InventoryComponent->AddWeaponToList(Weapon);
 	DropWeapon();
-	EquipWeapon(SwapWeapon);
+	EquipWeapon(Weapon);
 }
 
 void UWeaponComponent::InitAmmo()

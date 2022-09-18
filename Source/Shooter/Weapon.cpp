@@ -14,6 +14,8 @@ AWeapon::AWeapon()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	ItemRare = EItemRare::EIR_Damaged;
+
 }
 
 bool AWeapon::IsMagazineFull()
@@ -90,5 +92,5 @@ void AWeapon::GetPickupItem()
 	UGameplayStatics::PlaySound2D(this, GetEquipSound());
 	const auto WeaponComponent = Cast<UWeaponComponent>(Char->GetComponentByClass(UWeaponComponent::StaticClass()));
 	if (!WeaponComponent) return;
-	WeaponComponent->SwapWeapon(this);
+	WeaponComponent->PickupWeapon(this);
 }

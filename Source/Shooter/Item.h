@@ -73,10 +73,6 @@ private:// variables
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	FString ItemName = FString("Default");
 
-	//Rare Item
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	EItemRare ItemRare = EItemRare::EIR_Max;
-
 	//Count Stars
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	TArray<bool> ActiveStars;
@@ -138,6 +134,10 @@ protected://variables
 	//Sphere component to limit area where we can widget toogle 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Base Properties")
 	class USphereComponent* AgroSphere;
+
+	//Rare Item
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	EItemRare ItemRare = EItemRare::EIR_Max;
 
 	//Amount our ammo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo", meta = (AllowPrivateAccess = "true"))
@@ -225,4 +225,6 @@ public://functions
 	FORCEINLINE int32 GetAmmoAmount() const { return AmmoAmount; }
 
 	virtual void GetPickupItem();
+
+	FORCEINLINE EItemRare GetItemRare() const { return ItemRare; }
 };

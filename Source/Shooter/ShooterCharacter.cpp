@@ -12,6 +12,7 @@
 #include "Components/ShooterCharMovementComponent.h"
 #include "Components/WeaponComponent.h"
 #include "Components/PickupComponent.h"
+#include "Components/InventoryComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCharacter, All, All)
@@ -39,6 +40,8 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjInit) :
 
 	HandSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("HandComponent"));
 
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
+
 	//Disable controller rotate for mesh. let the controller onlu affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
@@ -55,6 +58,7 @@ void AShooterCharacter::BeginPlay()
 	check(GetMovementComponent());
 	check(CameraBoom);
 	check(WeaponComponent);
+	check(InventoryComponent);
 
 	if (FollowCamera)
 	{

@@ -200,7 +200,9 @@ void AItem::StartPickupItem(AShooterCharacter* Char)
 	//ToggleCustomDepth(true);
 	GetWorldTimerManager().SetTimer(TimerInterpCurve, this, &AItem::FinishInterpItem, InterpTimeCurve);
 
-	const float InitialCameraYaw = Char->GetFollowCamera()->GetComponentRotation().Yaw;
+	const auto CameraComponent = Cast<UCameraComponent>(Char->GetComponentByClass(UCameraComponent::StaticClass()));
+	if (!CameraComponent) return;
+	const float InitialCameraYaw = CameraComponent->GetComponentRotation().Yaw;
 	const float InitialItemYaw = GetActorRotation().Yaw;
 	InterpInitialYawOffset = InitialItemYaw - InitialCameraYaw;
 }
@@ -343,7 +345,9 @@ void AItem::ItemInterp(float DeltaTime)
 	SetActorLocation(TickLocation, false, nullptr, ETeleportType::TeleportPhysics);
 
 	//Set Item Rotation when we interp
-	const FRotator CurrentCameraRotaion = Character->GetFollowCamera()->GetComponentRotation();
+	const auto CameraComponent = Cast<UCameraComponent>(Character->GetComponentByClass(UCameraComponent::StaticClass()));
+	if (!CameraComponent) return;
+	const FRotator CurrentCameraRotaion = CameraComponent->GetComponentRotation();
 	const FRotator ItemRotation{ 0.f, CurrentCameraRotaion.Yaw + InterpInitialYawOffset, 0.f };
 	SetActorRotation(ItemRotation, ETeleportType::TeleportPhysics);
 
