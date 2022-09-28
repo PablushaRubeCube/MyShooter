@@ -53,8 +53,8 @@ protected://functions
 	//Change Crosshire Spread when we do anythink
 	void CalculateCrosshireSpead(float DeltaTime);
 
-	//call in eventtick for display Widget of item class
-	void DisplayWidget();
+	//
+	void TraceForItem();
 
 	//Select Button Functions
 	void SelectButtonPressed();
@@ -185,12 +185,6 @@ public://functions
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	//Returns CameraBoom subobject
-	//FORCEINLINE  USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-
-	//Return CameraComponent subobject
-	//FORCEINLINE UShooterCharacterCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	//Return HandComponent for clip reload function
 	UFUNCTION(BlueprintPure)

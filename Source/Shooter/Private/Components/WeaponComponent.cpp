@@ -149,8 +149,11 @@ void UWeaponComponent::PickupWeapon(AWeapon* Weapon)
 	const auto InventoryComponent = Cast<UInventoryComponent>(CharOwner->GetComponentByClass(UInventoryComponent::StaticClass()));
 	if (!InventoryComponent) return;
 	InventoryComponent->AddWeaponToList(Weapon);
-	DropWeapon();
-	EquipWeapon(Weapon);
+	if (InventoryComponent->IsInvetoryFull())
+	{
+		DropWeapon();
+		EquipWeapon(Weapon);
+	}
 }
 
 void UWeaponComponent::InitAmmo()

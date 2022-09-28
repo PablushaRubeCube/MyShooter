@@ -15,6 +15,9 @@ public class Shooter : ModuleRules
         PublicIncludePaths.AddRange(new string[]
        {
             "Shooter/Public/Components",
+            "Shooter",
+            "Shooter/Public/Items",
+            "Shooter/Public/Widgets",
        });
 
         // Uncomment if you are using Slate UI

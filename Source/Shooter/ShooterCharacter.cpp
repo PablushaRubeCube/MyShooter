@@ -83,11 +83,11 @@ void AShooterCharacter::Tick(float DeltaTime)
 
 	CalculateCrosshireSpead(DeltaTime);
 		
-	DisplayWidget();
+	TraceForItem();
 	
 }
 
-void AShooterCharacter::DisplayWidget()
+void AShooterCharacter::TraceForItem()
 {
 	if (bOverlapAgroItem)
 	{
@@ -97,6 +97,10 @@ void AShooterCharacter::DisplayWidget()
 		if (PickUpItem.bBlockingHit)
 		{
 			TraceHitItem = Cast <AItem>(PickUpItem.Actor);
+			if(TraceHitItem && TraceHitItem->GetItemStates() == EItemStates::EIS_EquipInterping)
+			{
+				TraceHitItem = nullptr;
+			}
 			if (TraceHitItem && TraceHitItem->GetPickUpWidget())
 			{
 				TraceHitItem->GetPickUpWidget()->SetVisibility(true);
@@ -314,6 +318,19 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction(TEXT("ReloadButton"), EInputEvent::IE_Pressed, WeaponComponent, &UWeaponComponent::ReloadButtonPressed);
 	
 	PlayerInputComponent->BindAction(TEXT("Crouch"), EInputEvent::IE_Pressed, this, &AShooterCharacter::CrouchButtonPressed);
+
+	TMap<FName, int32> PressedItems =
+	{ {"DefaultItem", 0},{"FirstItem", 1} ,{"SecondItem", 2} ,{"ThirdItem", 3} ,{"FourItem", 4} ,{"FiveItem", 5} };
+	DECLARE_DELEGATE_OneParam(FChooseItem, int32);
+	for (const auto& [PressedItemName, ItemIndex] : PressedItems)
+	{
+	//	PlayerInputComponent->BindAction<FChooseItem>(PressedItemName, IE_Pressed, InventoryComponent, &UInventoryComponent::ChooseInventoryItem, ItemIndex);
+	}
+	/*TMap<FName, int32> PressedItems ={ {"DefaultItem", 5} };
+	for (const auto& [PressedItemName, ItemIndex] : PressedItems)
+	{
+		Пример;
+	}*/
 }
 
 void AShooterCharacter::IncrementAgroCountItem(int8 Amount)

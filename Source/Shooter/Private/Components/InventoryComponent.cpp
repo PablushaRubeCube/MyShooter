@@ -2,6 +2,12 @@
 
 
 #include "Components/InventoryComponent.h"
+#include "Components/WeaponComponent.h"
+#include "Widgets/InventoryWidget.h"
+#include "ShooterPlayerController.h"
+#include "ShooterCharacter.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogInventoryComponent, All, All)
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -26,7 +32,14 @@ void UInventoryComponent::BeginPlay()
 void UInventoryComponent::AddWeaponToList(AWeapon* Weapon)
 {
 	if (!Weapon) return;
-	WeaponList.Add(Weapon);
+	if (WeaponList.Num() < MaxWeaponList)
+	{
+		WeaponList.Add(Weapon);
+	}
+	else
+	{
+		bIsInventoryFull = true;
+	}
 }
 
 AWeapon* UInventoryComponent::GetSpecificWeapon(int32 WeaponNumber) const
@@ -36,6 +49,16 @@ AWeapon* UInventoryComponent::GetSpecificWeapon(int32 WeaponNumber) const
 		return nullptr;
 	}
 	return WeaponList[WeaponNumber];
+}
+
+void UInventoryComponent::ChooseInventoryItem(FName PressedName)
+{
+	AShooterCharacter* Char = Cast<AShooterCharacter>(GetOwner());
+	if (!Char) return;
+	const auto WeaponComponent =  Cast<UWeaponComponent>(Char->GetComponentByClass(UWeaponComponent::StaticClass()));
+	if (!WeaponComponent) return;
+	//WeaponComponent->EquipWeapon(WeaponList)
+	//OnChooseItem.Broadcast(PressedName);
 }
 
 

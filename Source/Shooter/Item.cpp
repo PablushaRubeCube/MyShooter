@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "Curves/CurveVector.h"
+#include "ShooterCoreTypes.h"
 
 DEFINE_LOG_CATEGORY_STATIC(ItemLog, All, All)
 
@@ -96,7 +97,7 @@ void AItem::UpdateGlowMaterial()
 		break;
 	case EItemStates::EIS_Falling:
 		break;
-	case EItemStates::EIS_Max:
+	case EItemStates::EIS_MAX:
 		break;
 	default:
 		break;
@@ -175,7 +176,7 @@ void AItem::SetRare()
 		ActiveStars[3] = true;
 		ActiveStars[4] = true;
 		break;
-	case EItemRare::EIR_Max:
+	case EItemRare::EIR_MAX:
 		break;
 	default:
 		break;
@@ -274,6 +275,19 @@ void AItem::SetItemProperties(EItemStates State)
 		break;
 
 	case EItemStates::EIS_PickedUp:
+		PickUpWidget->SetVisibility(false);
+		//set properties for Mesh Item
+		GetMeshComponent()->SetSimulatePhysics(false);
+		GetMeshComponent()->SetVisibility(false);
+		GetMeshComponent()->SetEnableGravity(false);
+		GetMeshComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		GetMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		//Set Collision properties for Sphere item
+		AgroSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		AgroSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		//SetCollision properties for CollisionBox
+		CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		break;
 
 	case EItemStates::EIS_Falling:
@@ -281,6 +295,7 @@ void AItem::SetItemProperties(EItemStates State)
 		GetMeshComponent()->SetSimulatePhysics(true);
 		GetMeshComponent()->SetVisibility(true);
 		GetMeshComponent()->SetEnableGravity(true);
+		GetMeshComponent()->SetVisibility(true);
 		GetMeshComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		GetMeshComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
 		GetMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -295,7 +310,7 @@ void AItem::SetItemProperties(EItemStates State)
 		ToggleGlowMaterial(true);
 		break;
 
-	case EItemStates::EIS_Max:
+	case EItemStates::EIS_MAX:
 		break;
 
 	default:

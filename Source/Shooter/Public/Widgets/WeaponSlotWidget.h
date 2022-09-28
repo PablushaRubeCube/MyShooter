@@ -28,6 +28,12 @@ private://variables
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Weapon", meta = (AllowPrivateAccess = true))
 	TMap<EWeaponType, UTexture2D*> WeaponTextures;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Weapon", meta = (AllowPrivateAccess = true))
+	TMap<EAmmoType, UTexture2D*> AmmoTextures;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UWidgetAnimation* SelectAnimation;
+
 private://functions
 
 	UFUNCTION(BlueprintPure)
@@ -35,7 +41,20 @@ private://functions
 
 	UFUNCTION(BlueprintPure)
 	EWeaponType GetWeaponType();
+
+	UFUNCTION(BlueprintPure)
+	EAmmoType GetWeaponAmmoType();
+
+	UFUNCTION(BlueprintPure)
+	bool GetWeaponAmmo(int32& Ammo);
 	
 	class AWeapon* GetWeapon();
 
+	UFUNCTION(BlueprintPure)
+	UWidgetAnimation* GetSelectAnimation() { return SelectAnimation; }
+
+public:// Functions
+
+	void PlayChooseAnimation();
+	void PlayReverseChooseAnimation();
 };
