@@ -4,59 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ShooterCoreTypes.h"
 #include "Item.generated.h"
-
-UENUM(BlueprintType)
-enum class EItemRare : uint8
-{
-	EIR_Damaged UMETA(DisplayName "Damaged"),
-	EIR_Common UMETA(DisplayName "Common"),
-	EIR_Uncommon UMETA(DisplayName "Incommon"),
-	EIR_Rare UMETA(DisplayName "Rare"),
-	EIR_Legendary UMETA(DisplayName "Legendary"),
-
-	EIR_Max UMETA(DisplayName "Default")
-};
-
-UENUM(BlueprintType)
-enum class EItemStates : uint8
-{
-	EIS_Equipped UMETA(DisplayName"Equipped"),
-	EIS_Pickup UMETA(DispayName "Pickup"),
-	EIS_EquipInterping UMETA(DisplayName"EquipInterping"),
-	EIS_PickedUp UMETA (DisplayName "PickedUp"),
-	EIS_Falling UMETA(DisplayName"Falling"),
-
-	EIS_Max UMETA(DispalyName "Default")
-
-};
-
-USTRUCT(BlueprintType)
-struct FGlowMaterial
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere)
-	class UCurveVector* MaterialCurve;
-
-	UPROPERTY(EditAnywhere)
-	UCurveVector* InterpItemCurve;
-
-	FTimerHandle TimerGlowMaterial;
-
-	UPROPERTY(EditAnywhere)
-	float TimeGlowMaterial = 5.f;
-
-	UPROPERTY(EditAnywhere)
-	float FresnelMultiplay = 150.f;
-
-	UPROPERTY(EditAnywhere)
-	float ExponentFresnel = 3.f;
-
-	UPROPERTY(EditAnywhere)
-	float FresnelFraction = 4.f;
-};
-
 
 UCLASS()
 class SHOOTER_API AItem : public AActor
@@ -137,7 +86,7 @@ protected://variables
 
 	//Rare Item
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	EItemRare ItemRare = EItemRare::EIR_Max;
+	EItemRare ItemRare = EItemRare::EIR_MAX;
 
 	//Amount our ammo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo", meta = (AllowPrivateAccess = "true"))

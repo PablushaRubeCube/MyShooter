@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "../AmmoType.h"
+#include "ShooterCoreTypes.h"
 #include "WeaponComponent.generated.h"
 
 
@@ -104,9 +104,6 @@ private://functions
 	//Spawn Weapon when we start
 	class AWeapon* SpawnDefaultWeapon();
 
-	//EquipWeapon
-	void EquipWeapon(AWeapon* EquipWeapon);
-
 	//Drop Weapon
 	void DropWeapon();
 
@@ -154,7 +151,7 @@ public:
 	//Return Aiming condition our char
 	bool GetAimingCondition();
 
-	//Swap Weapon
+	//Pickup Weapon
 	void PickupWeapon(AWeapon* Weapon);
 
 	/** Call when we press the button*/
@@ -172,4 +169,8 @@ public:
 
 	void AddAmmo(class AAmmo* Ammo);
 
+	//EquipWeapon
+	void EquipWeapon(AWeapon* EquipWeapon);
+
+	FORCEINLINE AWeapon* GetEquippedWeapon() const { return EquippedWeapon; }
 };

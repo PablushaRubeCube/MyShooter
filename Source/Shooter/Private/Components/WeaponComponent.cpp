@@ -109,6 +109,8 @@ AWeapon* UWeaponComponent::SpawnDefaultWeapon()
 		const auto InventoryComponent = Cast<UInventoryComponent>(CharOwner->GetComponentByClass(UInventoryComponent::StaticClass()));
 		if (!InventoryComponent) return nullptr;
 		InventoryComponent->AddWeaponToList(SpawnedWeapon);
+		const int32 FirstChoosenWeapon {0};
+		InventoryComponent->ChooseInventoryItem(FirstChoosenWeapon);
 		return SpawnedWeapon;
 	}
 	return nullptr;
@@ -149,8 +151,12 @@ void UWeaponComponent::PickupWeapon(AWeapon* Weapon)
 	const auto InventoryComponent = Cast<UInventoryComponent>(CharOwner->GetComponentByClass(UInventoryComponent::StaticClass()));
 	if (!InventoryComponent) return;
 	InventoryComponent->AddWeaponToList(Weapon);
-	DropWeapon();
-	EquipWeapon(Weapon);
+	Weapon->SetItemStates(EItemStates::EIS_PickedUp);
+	if (InventoryComponent->IsInvetoryFull())
+	{
+		DropWeapon();
+		EquipWeapon(Weapon);
+	}
 }
 
 void UWeaponComponent::InitAmmo()
