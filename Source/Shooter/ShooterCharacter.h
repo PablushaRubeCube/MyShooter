@@ -13,9 +13,12 @@ enum class ECombatState : uint8
 ECS_Unoccupied UMETA(DisplayName = "Unoccupied"),
 ECS_FireTimerProgress UMETA(DisplayName = "FireInProgress"),
 ECS_Reloading UMETA(DisplayName = "Reloading"),
+ECS_Equiping UMETA(DisplayName "Equiping"),
 
 ECS_MAX UMETA(DisplayName = "Default")
 };
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnPickupEmptySlot, int32 WeaponSlotIndex, bool bIsTraceForItem)
 
 UCLASS()
 class SHOOTER_API AShooterCharacter : public ACharacter
@@ -27,6 +30,9 @@ public:
 	AShooterCharacter(const FObjectInitializer& ObjInit);
 
 private://functions
+
+	UFUNCTION(BlueprintCallable)
+	void EquipInProgress();
 
 protected://functions
 	// Called when the game starts or when spawned
@@ -174,6 +180,10 @@ private://variables
 	//Clip Attach for this SceneComponent when we reload clip
 	UPROPERTY()
 	USceneComponent* HandSceneComponent;
+
+public:
+
+	FOnPickupEmptySlot OnPickupEmptySlot;
 
 protected://variables
 

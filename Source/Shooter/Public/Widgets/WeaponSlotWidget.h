@@ -34,6 +34,15 @@ private://variables
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	UWidgetAnimation* SelectAnimation;
 
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UWidgetAnimation* PickupAnimation;
+
+	UPROPERTY(meta = (BindWidget))
+	class UImage* ArrowIcon;
+
+	UPROPERTY(meta = (BindWidget))
+	class UBorder* PickupBorder;
+
 private://functions
 
 	UFUNCTION(BlueprintPure)
@@ -55,10 +64,12 @@ private://functions
 
 	void CheckItem(int32 SelectIndex, int32 PreviousSelectIndex);
 
-protected://functinos
-	virtual void NativeOnInitialized() override;
-
+	void PlayPickupAnimation(int32 SlotIndex, bool bIsTraceForItem);
 
 	void PlayChooseAnimation();
 	void PlayReverseChooseAnimation();
+
+protected://functinos
+	virtual void NativeOnInitialized() override;
+
 };

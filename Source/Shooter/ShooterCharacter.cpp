@@ -48,6 +48,12 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjInit) :
 	bUseControllerRotationYaw = true;
 }
 
+void AShooterCharacter::EquipInProgress()
+{
+	CombatState == ECombatState::ECS_Equiping ?
+	CombatState = ECombatState::ECS_Unoccupied : CombatState = ECombatState::ECS_Equiping;
+}
+
 // Called when the game starts or when spawned
 void AShooterCharacter::BeginPlay()
 {
@@ -103,6 +109,11 @@ void AShooterCharacter::TraceForItem()
 			}
 			if (TraceHitItem && TraceHitItem->GetPickUpWidget())
 			{
+				int32 InventorySlot;
+				if (InventoryComponent->GetNextEmptyInventorySlot(InventorySlot))
+				{
+					OnPickupEmptySlot.Broadcast(InventorySlot,true);
+				}
 				TraceHitItem->GetPickUpWidget()->SetVisibility(true);
 			}
 			if (TraceHitItemLast) // if we have last frame
@@ -114,6 +125,14 @@ void AShooterCharacter::TraceForItem()
 				}
 			}
 			TraceHitItemLast = TraceHitItem; // save last frame item
+		}
+		else
+		{
+			int32 InventorySlot;
+			if (InventoryComponent->GetNextEmptyInventorySlot(InventorySlot))
+			{
+				OnPickupEmptySlot.Broadcast(InventorySlot, false);
+			}
 		}
 	}
 	//if we end overlap sphere

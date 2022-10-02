@@ -49,22 +49,35 @@ AWeapon* UInventoryComponent::GetSpecificWeapon(int32 WeaponNumber) const
 void UInventoryComponent::ChooseInventoryItem(int32 IndexItem)
 {
 	AShooterCharacter* Char = Cast<AShooterCharacter>(GetOwner());
-	if (!Char) return;
-	if (Char->GetECombatState() != ECombatState::ECS_Unoccupied) return;
-	const auto WeaponComponent =  Cast<UWeaponComponent>(GetOwner()->GetComponentByClass(UWeaponComponent::StaticClass()));
-	if (!WeaponComponent) return;
-	if (WeaponComponent->GetEquippedWeapon())
+	if (!Char || !WeaponList.IsValidIndex(IndexItem)) return;
+	if (Char->GetECombatState() == ECombatState::ECS_Unoccupied || Char->GetECombatState() == ECombatState::ECS_Equiping)
 	{
-		WeaponComponent->GetEquippedWeapon()->SetItemStates(EItemStates::EIS_PickedUp);
+		const auto WeaponComponent = Cast<UWeaponComponent>(GetOwner()->GetComponentByClass(UWeaponComponent::StaticClass()));
+		if (!WeaponComponent) return;
+		if (WeaponComponent->GetEquippedWeapon())
+		{
+			WeaponComponent->GetEquippedWeapon()->SetItemStates(EItemStates::EIS_PickedUp);
+		}
+		OnChooseItem.Broadcast(IndexItem, PreviousSelectWeaponIndex);
+		PreviousSelectWeaponIndex = IndexItem;
+		if (WeaponList.IsValidIndex(IndexItem))
+		{
+			const auto Weapon = WeaponList[IndexItem];
+			if (Weapon)
+				WeaponComponent->EquipWeapon(Weapon);
+			Char->PlayAnimMontage(EquipMontage);
+		}
 	}
-	OnChooseItem.Broadcast(IndexItem, PreviousSelectWeaponIndex);
-	PreviousSelectWeaponIndex = IndexItem;
-	if (WeaponList.IsValidIndex(IndexItem))
+}
+
+bool UInventoryComponent::GetNextEmptyInventorySlot(int32& WeaponSlotIndex) const
+{
+	if (!IsInvetoryFull())
 	{
-		const auto Weapon = WeaponList[IndexItem];
-		if (Weapon)
-		WeaponComponent->EquipWeapon(Weapon);
+		WeaponSlotIndex = WeaponList.Num();
+		return true;
 	}
+	return false;
 }
 
 

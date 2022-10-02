@@ -4,7 +4,10 @@
 #include "Widgets/WeaponSlotWidget.h"
 #include "../ShooterCharacter.h"
 #include "Components/InventoryComponent.h"
+#include "Components/Border.h"
+#include "Components/Image.h"
 #include "../Weapon.h"
+
 
 DEFINE_LOG_CATEGORY_STATIC(LogWeaponSlotWidget, All, All)
 
@@ -47,6 +50,23 @@ AWeapon* UWeaponSlotWidget::GetWeapon()
 	return Weapon;
 }
 
+void UWeaponSlotWidget::PlayPickupAnimation(int32 SlotIndex, bool bIsTraceForItem)
+{
+	if (NumberWeaponSlot != SlotIndex) return;
+	if (bIsTraceForItem)
+	{
+		ArrowIcon->SetVisibility(ESlateVisibility::Visible);
+		PickupBorder->SetVisibility(ESlateVisibility::Visible);
+		PlayAnimation(PickupAnimation,0.f,0);
+	}
+	else
+	{
+		ArrowIcon->SetVisibility(ESlateVisibility::Hidden);
+		PickupBorder->SetVisibility(ESlateVisibility::Hidden);
+		StopAnimation(PickupAnimation);
+	}
+}
+
 void UWeaponSlotWidget::PlayChooseAnimation()
 {
 	PlayAnimation(GetSelectAnimation());
@@ -76,6 +96,7 @@ void UWeaponSlotWidget::NativeOnInitialized()
 
 	const auto Char = Cast<AShooterCharacter>(GetOwningPlayerPawn());
 	if (!Char) return;
+	Char->OnPickupEmptySlot.AddUObject(this, &UWeaponSlotWidget::PlayPickupAnimation);
 	const auto Component = Cast<UInventoryComponent>(Char->GetComponentByClass(UInventoryComponent::StaticClass()));
 	if (!Component) return;
 	Component->OnChooseItem.AddUObject(this, &UWeaponSlotWidget::CheckItem);

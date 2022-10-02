@@ -30,6 +30,11 @@ private://variables
 	//For Widget inventory index//Change to 0 when game is start and spawn default weapon
 	int32 PreviousSelectWeaponIndex = INT32_MAX;
 
+protected://variables
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	class UAnimMontage* EquipMontage;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -49,5 +54,7 @@ public:	//functions
 	bool IsInvetoryFull() const {return bIsInventoryFull;}
 
 	void ChooseInventoryItem(int32 IndexItem);
+
+	bool GetNextEmptyInventorySlot(int32& WeaponSlotIndex) const;
 		
 };
