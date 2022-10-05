@@ -52,14 +52,13 @@ AWeapon* UWeaponSlotWidget::GetWeapon()
 
 void UWeaponSlotWidget::PlayPickupAnimation(int32 SlotIndex, bool bIsTraceForItem)
 {
-	if (NumberWeaponSlot != SlotIndex) return;
-	if (bIsTraceForItem)
+	if (NumberWeaponSlot == SlotIndex && bIsTraceForItem && !IsAnimationPlaying(PickupAnimation))
 	{
 		ArrowIcon->SetVisibility(ESlateVisibility::Visible);
 		PickupBorder->SetVisibility(ESlateVisibility::Visible);
 		PlayAnimation(PickupAnimation,0.f,0);
 	}
-	else
+	else if (NumberWeaponSlot != SlotIndex || (!bIsTraceForItem && IsAnimationPlaying(PickupAnimation)))
 	{
 		ArrowIcon->SetVisibility(ESlateVisibility::Hidden);
 		PickupBorder->SetVisibility(ESlateVisibility::Hidden);

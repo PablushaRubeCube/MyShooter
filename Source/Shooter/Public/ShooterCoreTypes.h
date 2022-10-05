@@ -1,6 +1,28 @@
 #pragma once
 
+#include "Engine/DataTable.h"
 #include "ShooterCoreTypes.generated.h"
+
+
+//weapon
+UENUM(BlueprintType)
+enum class EAmmoType : uint8
+{
+	EAT_9MM UMETA(DisplayName = "9mm"),
+	EAT_AR UMETA(DisplayName = "AR"),
+
+	EAT_MAX
+};
+
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	EWT_SubmachineGun UMETA(DisplayName = "SMG"),
+	EWT_AssaultRifle UMETA(DisplayName = "Rifle"),
+	EWT_Pistol UMETA(DisplayName = "Pistol"),
+
+	EWT_MAX
+};
 
 //item
 UENUM(BlueprintType)
@@ -54,22 +76,65 @@ struct FGlowMaterial
 		float FresnelFraction = 4.f;
 };
 
-//weapon
-UENUM(BlueprintType)
-enum class EAmmoType : uint8
+USTRUCT(BlueprintType)
+struct FItemRarityTable : public FTableRowBase
 {
-	EAT_9MM UMETA(DisplayName = "9mm"),
-	EAT_AR UMETA(DisplayName = "AR"),
+	GENERATED_BODY()
 
-	EAT_MAX
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Rarity")
+	FLinearColor GlowColor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Rarity")
+	FLinearColor TopWidgetColor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Rarity")
+	FLinearColor DownWidgetColor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Rarity")
+	int32 NumberOfStars;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Rarity")
+	UTexture2D* IconBackground;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Rarity")
+	int32 CustomDepthStencil;
 };
 
-UENUM(BlueprintType)
-enum class EWeaponType : uint8
+USTRUCT(BlueprintType)
+struct FWeaponPropertiesTable : public FTableRowBase
 {
-	EWT_SubmachineGun UMETA(DisplayName = "SMG"),
-	EWT_AssaultRifle UMETA(DisplayName = "Rifle"),
-	EWT_Pistol UMETA(DisplayName = "Pistol"),
+	GENERATED_BODY()
 
-	EWT_MAX
+		/**Store Ammo Value current Weapon*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
+	int32 Ammo;
+	/** Store Max Magazine Capacity*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
+	int32 MagazineCapacity;
+
+	/**Store type of Weapon*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
+	EWeaponType WeaponType;
+
+	/**Store Type of use Ammo*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
+	EAmmoType AmmoType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
+	class USoundCue* PickupSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
+	class USoundCue* EquipSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
+	class  USkeletalMesh* WeaponMesh;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
+	FName WeaponName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
+	UTexture2D* InventoryIcon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
+	UTexture2D* AmmoIcon;
 };

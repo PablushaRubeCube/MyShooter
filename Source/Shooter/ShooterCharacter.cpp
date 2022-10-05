@@ -54,6 +54,15 @@ void AShooterCharacter::EquipInProgress()
 	CombatState = ECombatState::ECS_Unoccupied : CombatState = ECombatState::ECS_Equiping;
 }
 
+void AShooterCharacter::ShowPickupArrowSlot(const bool bIsTraceForItem)
+{
+	int32 InventorySlot;
+	if(InventoryComponent->GetNextEmptyInventorySlot(InventorySlot))
+	{
+		OnPickupEmptySlot.Broadcast(InventorySlot, bIsTraceForItem);
+	}
+}
+
 // Called when the game starts or when spawned
 void AShooterCharacter::BeginPlay()
 {
@@ -103,42 +112,30 @@ void AShooterCharacter::TraceForItem()
 		if (PickUpItem.bBlockingHit)
 		{
 			TraceHitItem = Cast <AItem>(PickUpItem.Actor);
-			if(TraceHitItem && TraceHitItem->GetItemStates() == EItemStates::EIS_EquipInterping)
+			if (TraceHitItem && TraceHitItem->GetItemStates() == EItemStates::EIS_EquipInterping)
 			{
 				TraceHitItem = nullptr;
+				ShowPickupArrowSlot(false);
 			}
 			if (TraceHitItem && TraceHitItem->GetPickUpWidget())
 			{
-				int32 InventorySlot;
-				if (InventoryComponent->GetNextEmptyInventorySlot(InventorySlot))
-				{
-					OnPickupEmptySlot.Broadcast(InventorySlot,true);
-				}
 				TraceHitItem->GetPickUpWidget()->SetVisibility(true);
+				ShowPickupArrowSlot(true);
 			}
-			if (TraceHitItemLast) // if we have last frame
+			if (TraceHitItemLast && TraceHitItemLast != TraceHitItem)// if we have last frame
 			{
-				if (TraceHitItemLast != TraceHitItem)
-				{
-					//if lastFrame diffirent  Item//or lastFrame null
-					TraceHitItemLast->GetPickUpWidget()->SetVisibility(false);
-				}
+				//if lastFrame diffirent  Item//or lastFrame null
+				TraceHitItemLast->GetPickUpWidget()->SetVisibility(false);
+				ShowPickupArrowSlot(false);
 			}
 			TraceHitItemLast = TraceHitItem; // save last frame item
-		}
-		else
-		{
-			int32 InventorySlot;
-			if (InventoryComponent->GetNextEmptyInventorySlot(InventorySlot))
-			{
-				OnPickupEmptySlot.Broadcast(InventorySlot, false);
-			}
 		}
 	}
 	//if we end overlap sphere
 	else if (TraceHitItemLast)
 	{
 		TraceHitItemLast->GetPickUpWidget()->SetVisibility(false);
+		ShowPickupArrowSlot(false);
 	}
 }
 

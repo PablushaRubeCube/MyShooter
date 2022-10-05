@@ -217,4 +217,6 @@ public://functions
 	FVector GetInterpLocation(const AItem* Item);
 
 	int32 GetInterpIndexLocation();
+
+	void ShowPickupArrowSlot(const bool bIsTraceForItem);
 };

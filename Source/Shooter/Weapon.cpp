@@ -20,7 +20,7 @@ AWeapon::AWeapon()
 
 bool AWeapon::IsMagazineFull()
 {
-	return MagazineCapacity == Ammo;
+	return GetMagazineCapacity() == GetAmmo();
 }
 
 // Called every frame
@@ -64,18 +64,14 @@ void AWeapon::ThrowWeapon()
 
 void AWeapon::DecrementAmmo()
 {
-	Ammo <= 0 ? Ammo = 0 : Ammo--;
+	GetAmmo() <= 0 ? WeaponPropertiesRow.Ammo = 0 : WeaponPropertiesRow.Ammo--;
 }
 
 void AWeapon::ReloadMagazine(int32 Value)
 {
-	checkf(MagazineCapacity >= Ammo + Value, TEXT("Reload Ammo more than MagazineCapacity"));
+	checkf(GetMagazineCapacity() >= GetAmmo() + Value, TEXT("Reload Ammo more than MagazineCapacity"));
 
-	Ammo += Value;
-	//if (MagazineCapacity >= Ammo + Value)
-	//{
-	//	
-	//}
+	WeaponPropertiesRow.Ammo += Value;
 }
 
 void AWeapon::StopFalling()
@@ -93,4 +89,33 @@ void AWeapon::GetPickupItem()
 	const auto WeaponComponent = Cast<UWeaponComponent>(Char->GetComponentByClass(UWeaponComponent::StaticClass()));
 	if (!WeaponComponent) return;
 	WeaponComponent->PickupWeapon(this);
+}
+
+void AWeapon::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	SetWeaponProperties();
+}
+
+void AWeapon::SetWeaponProperties()
+{
+	if (WeaponPropertiesData)
+	{
+		switch (GetWeaponType())
+		{
+		case EWeaponType::EWT_SubmachineGun:
+			WeaponPropertiesRow = *WeaponPropertiesData->FindRow<FWeaponPropertiesTable>(TEXT("SubmachineGun"),"");
+			break;
+		case EWeaponType::EWT_AssaultRifle:
+			WeaponPropertiesRow = *WeaponPropertiesData->FindRow<FWeaponPropertiesTable>(TEXT("AssaultRifle"), "");
+			break;
+		case EWeaponType::EWT_Pistol:
+			WeaponPropertiesRow = *WeaponPropertiesData->FindRow<FWeaponPropertiesTable>(TEXT("Pistol"), "");
+			break;
+		case EWeaponType::EWT_MAX:
+			break;
+		default:
+			break;
+		}
+	}
 }

@@ -66,6 +66,10 @@ private://functions
 
 	void UpdateGlowMaterial();
 
+	void SetColorFresnel();
+
+	void SetDepthStencilValue();
+
 protected://variables
 
 	//Skeletal Mesh of item
@@ -85,7 +89,7 @@ protected://variables
 	class USphereComponent* AgroSphere;
 
 	//Rare Item
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rarity", meta = (AllowPrivateAccess = "true"))
 	EItemRare ItemRare = EItemRare::EIR_MAX;
 
 	//Amount our ammo
@@ -119,6 +123,12 @@ protected://variables
 	UPROPERTY(EditAnywhere, Category = "Material")
 	FGlowMaterial GlowMaterial;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Rarity")
+	UDataTable* RarityTableObject;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Rarity")
+	FItemRarityTable RarityRow;
+
 protected://functions
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -148,6 +158,8 @@ protected://functions
 	void ToggleCustomDepth(bool bEnableCustomDepth);
 
 	void ToggleGlowMaterial(bool bEnableGlowMaterial);
+
+	void SetRarity();
 
 public://functions
 

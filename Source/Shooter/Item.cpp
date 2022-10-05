@@ -49,16 +49,13 @@ void AItem::BeginPlay()
 	
 	SetRare();
 	SetItemProperties(ItemStates);
-	//ToggleCustomDepth(false);
 }
 
 void AItem::OnConstruction(const FTransform& Transform)
 {
-	if (MeshMaterial)
-	{
-		MeshMaterialDynamic = UMaterialInstanceDynamic::Create(MeshMaterial, this);
-		GetMeshComponent()->SetMaterial(MaterialIndex, MeshMaterialDynamic);
-	}
+	SetRarity();
+	SetColorFresnel();
+	SetDepthStencilValue();
 }
 
 void AItem::PlayPickupSound(AShooterCharacter* Char)
@@ -105,6 +102,24 @@ void AItem::UpdateGlowMaterial()
 	MeshMaterialDynamic->SetScalarParameterValue(TEXT("FresnelMultiplay"), CurveVector.X * GlowMaterial.FresnelMultiplay);
 	MeshMaterialDynamic->SetScalarParameterValue(TEXT("ExponentFresnel"), CurveVector.Y * GlowMaterial.ExponentFresnel);
 	MeshMaterialDynamic->SetScalarParameterValue(TEXT("FresnelFraction"), CurveVector.Z * GlowMaterial.FresnelFraction);
+}
+
+void AItem::SetColorFresnel()
+{
+	if (MeshMaterial)
+	{
+		MeshMaterialDynamic = UMaterialInstanceDynamic::Create(MeshMaterial, this);
+		MeshMaterialDynamic->SetVectorParameterValue(TEXT("Color Fresnel"), RarityRow.GlowColor);
+		GetMeshComponent()->SetMaterial(MaterialIndex, MeshMaterialDynamic);
+	}
+}
+
+void AItem::SetDepthStencilValue()
+{
+	if (GetMeshComponent())
+	{
+		GetMeshComponent()->SetCustomDepthStencilValue(RarityRow.CustomDepthStencil);
+	}
 }
 
 void AItem::BeginOverlapAgroSphere(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -383,5 +398,32 @@ void AItem::ToggleGlowMaterial(bool bEnableGlowMaterial)
 	if (MeshMaterialDynamic)
 	{
 		MeshMaterialDynamic->SetScalarParameterValue(TEXT("AlphaBlend"), !bEnableGlowMaterial);
+	}
+}
+
+void AItem::SetRarity()
+{
+	//FString RarityTablePath(TEXT("DataTable'/Game/_Shooter/DataTables/DT_ItemRarity.DT_ItemRarity'"));
+	//UDataTable* RarityTableObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *RarityTablePath));
+	if (RarityTableObject)
+	{
+		switch (ItemRare)
+		{
+		case EItemRare::EIR_Damaged:
+			RarityRow = *RarityTableObject->FindRow<FItemRarityTable>(FName("Damaged"), TEXT(""));
+			break;
+		case EItemRare::EIR_Common:
+			RarityRow = *RarityTableObject->FindRow<FItemRarityTable>(FName("Common"), TEXT(""));
+			break;
+		case EItemRare::EIR_Uncommon:
+			RarityRow = *RarityTableObject->FindRow<FItemRarityTable>(FName("Uncommon"), TEXT(""));
+			break;
+		case EItemRare::EIR_Rare:
+			RarityRow = *RarityTableObject->FindRow<FItemRarityTable>(FName("Rare"), TEXT(""));
+			break;
+		case EItemRare::EIR_Legendary:
+			RarityRow = *RarityTableObject->FindRow<FItemRarityTable>(FName("Legendary"), TEXT(""));
+			break;
+		}
 	}
 }

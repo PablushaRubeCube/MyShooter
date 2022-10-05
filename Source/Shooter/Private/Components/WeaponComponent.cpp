@@ -157,6 +157,7 @@ void UWeaponComponent::PickupWeapon(AWeapon* Weapon)
 		DropWeapon();
 		EquipWeapon(Weapon);
 	}
+	CharOwner->ShowPickupArrowSlot(false);
 }
 
 void UWeaponComponent::InitAmmo()
