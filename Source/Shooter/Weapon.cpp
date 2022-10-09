@@ -14,6 +14,9 @@ AWeapon::AWeapon()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	ItemMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ItemMesh"));
+	SetRootComponent(ItemMesh);
+
 	ItemRare = EItemRare::EIR_Damaged;
 
 }
@@ -33,9 +36,7 @@ void AWeapon::Tick(float DeltaTime)
 		//Rotate Mesh onlyYaw when we Throwed Weapon
 		FRotator RotationMesh(0.f, GetSkeletalMeshComponent()->GetComponentRotation().Yaw, 0.f);
 		GetSkeletalMeshComponent()->SetWorldRotation(RotationMesh, false, nullptr, ETeleportType::TeleportPhysics);
-
 	}
-
 }
 
 void AWeapon::ThrowWeapon()
@@ -76,7 +77,6 @@ void AWeapon::ReloadMagazine(int32 Value)
 
 void AWeapon::StopFalling()
 {
-
 	bWeaponFalling = false;
 	SetItemStates(EItemStates::EIS_Pickup);
 }
@@ -99,9 +99,10 @@ void AWeapon::OnConstruction(const FTransform& Transform)
 
 void AWeapon::SetWeaponProperties()
 {
-	if (WeaponPropertiesData)
-	{
-		switch (GetWeaponType())
+	if (WeaponPropertiesData && !RowName.Contains(WeaponType)) return;
+	WeaponPropertiesRow = *WeaponPropertiesData->FindRow<FWeaponPropertiesTable>(*RowName.Find(WeaponType), TEXT(""));
+	GetSkeletalMeshComponent()->SetSkeletalMesh(WeaponPropertiesRow.WeaponMesh);
+	/*	switch (GetWeaponType())
 		{
 		case EWeaponType::EWT_SubmachineGun:
 			WeaponPropertiesRow = *WeaponPropertiesData->FindRow<FWeaponPropertiesTable>(TEXT("SubmachineGun"),"");
@@ -116,6 +117,5 @@ void AWeapon::SetWeaponProperties()
 			break;
 		default:
 			break;
-		}
-	}
+		}*/
 }

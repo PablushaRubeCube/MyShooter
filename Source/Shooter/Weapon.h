@@ -29,10 +29,13 @@ private://variables
 	FRotator MeshRotation = FRotator::ZeroRotator;
 
 private://Functions
-
 	void SetWeaponProperties();
 
 protected://variables
+
+	//Skeletal Mesh of item
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	class USkeletalMeshComponent* ItemMesh;
 
 	//Store anim montage Name current weapon
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
@@ -47,11 +50,20 @@ protected://variables
 
 	int32 SlotNumber;
 
+	/**Store type of Weapon*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
+	EWeaponType WeaponType;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	UDataTable* WeaponPropertiesData;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
 	FWeaponPropertiesTable WeaponPropertiesRow;
+
+	TMap<EWeaponType, FName> RowName{
+			{EWeaponType::EWT_SubmachineGun, TEXT("SubmachineGun")},
+			{EWeaponType::EWT_AssaultRifle, TEXT("AssaultRifle")},
+			{EWeaponType::EWT_Pistol, TEXT("Pistol")} };
 
 protected://functions
 
@@ -61,6 +73,12 @@ protected://functions
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+	virtual UMeshComponent* GetMeshComponent() override { return ItemMesh; }
+
+	//Get Sounds
+	virtual class USoundCue* GetPickupSound() override { return WeaponPropertiesRow.PickupSound; }
+	virtual USoundCue* GetEquipSound() override { return WeaponPropertiesRow.EquipSound; }
+
 public:
 	/** Call when player Throw Weapon */
 	void ThrowWeapon();
@@ -69,7 +87,7 @@ public:
 	FORCEINLINE int32 GetAmmo() const { return WeaponPropertiesRow.Ammo; }
 	/**Get Max Current Weapon Magazine Capacity  */
 	FORCEINLINE int32 GetMagazineCapacity() const { return WeaponPropertiesRow.MagazineCapacity; }
-	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponPropertiesRow.WeaponType; }
+	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; }
 	UFUNCTION(BlueprintPure)
 	EAmmoType GetAmmoType() const { return WeaponPropertiesRow.AmmoType; }
 
@@ -83,5 +101,5 @@ public:
 	void ReloadMagazine(int32 Value);
 	bool IsMagazineFull();
 
-	virtual UMeshComponent* GetMeshComponent() const { return ItemMesh; }
+	FORCEINLINE USkeletalMeshComponent* GetSkeletalMeshComponent() const { return ItemMesh; }
 };

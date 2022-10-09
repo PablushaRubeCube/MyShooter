@@ -24,6 +24,50 @@ enum class EWeaponType : uint8
 	EWT_MAX
 };
 
+USTRUCT(BlueprintType)
+struct FWeaponPropertiesTable : public FTableRowBase
+{
+	GENERATED_BODY()
+
+		//Name of specifically item
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Name")
+	FString ItemName = FString("Default");
+
+	/**Store Ammo Value current Weapon*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Magazine")
+	int32 Ammo;
+	/** Store Max Magazine Capacity*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Magazine")
+	int32 MagazineCapacity;
+
+	/**Store type of Weapon*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Type")
+	EWeaponType WeaponType;
+
+	/**Store Type of use Ammo*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Type")
+	EAmmoType AmmoType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mesh")
+	class  USkeletalMesh* WeaponMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget")
+	UTexture2D* InventoryIcon;
+
+	/** Set Pickup widget Icon*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget")
+	UTexture2D* AmmoIcon;
+
+	/** Sound Equip current item */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
+	class USoundCue* EquipSound;
+
+	///** Sound pickup current item */
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	class USoundCue* PickupSound;
+
+};
+
 //item
 UENUM(BlueprintType)
 enum class EItemRare : uint8
@@ -100,41 +144,4 @@ struct FItemRarityTable : public FTableRowBase
 	int32 CustomDepthStencil;
 };
 
-USTRUCT(BlueprintType)
-struct FWeaponPropertiesTable : public FTableRowBase
-{
-	GENERATED_BODY()
 
-		/**Store Ammo Value current Weapon*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
-	int32 Ammo;
-	/** Store Max Magazine Capacity*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
-	int32 MagazineCapacity;
-
-	/**Store type of Weapon*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
-	EWeaponType WeaponType;
-
-	/**Store Type of use Ammo*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
-	EAmmoType AmmoType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
-	class USoundCue* PickupSound;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
-	class USoundCue* EquipSound;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
-	class  USkeletalMesh* WeaponMesh;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
-	FName WeaponName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
-	UTexture2D* InventoryIcon;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponProperty")
-	UTexture2D* AmmoIcon;
-};

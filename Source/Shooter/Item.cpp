@@ -21,9 +21,6 @@ AItem::AItem()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	ItemMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ItemMesh"));
-	SetRootComponent(ItemMesh);
-
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	CollisionBox->SetupAttachment(GetRootComponent());
 	CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
@@ -405,25 +402,34 @@ void AItem::SetRarity()
 {
 	//FString RarityTablePath(TEXT("DataTable'/Game/_Shooter/DataTables/DT_ItemRarity.DT_ItemRarity'"));
 	//UDataTable* RarityTableObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *RarityTablePath));
-	if (RarityTableObject)
+	if (RarityTableData)
 	{
-		switch (ItemRare)
-		{
-		case EItemRare::EIR_Damaged:
-			RarityRow = *RarityTableObject->FindRow<FItemRarityTable>(FName("Damaged"), TEXT(""));
-			break;
-		case EItemRare::EIR_Common:
-			RarityRow = *RarityTableObject->FindRow<FItemRarityTable>(FName("Common"), TEXT(""));
-			break;
-		case EItemRare::EIR_Uncommon:
-			RarityRow = *RarityTableObject->FindRow<FItemRarityTable>(FName("Uncommon"), TEXT(""));
-			break;
-		case EItemRare::EIR_Rare:
-			RarityRow = *RarityTableObject->FindRow<FItemRarityTable>(FName("Rare"), TEXT(""));
-			break;
-		case EItemRare::EIR_Legendary:
-			RarityRow = *RarityTableObject->FindRow<FItemRarityTable>(FName("Legendary"), TEXT(""));
-			break;
-		}
+		TMap<EItemRare, FName> RowName{ 
+			{EItemRare::EIR_Damaged, TEXT("Damaged")},
+			{EItemRare::EIR_Common, TEXT("Common")},
+			{EItemRare::EIR_Uncommon, TEXT("Uncommon")},
+			{EItemRare::EIR_Rare, TEXT("Rare")},
+			{EItemRare::EIR_Legendary, TEXT("Legendary")}, };		
+		if(!RowName.Contains(ItemRare)) return;
+		RarityRow = *RarityTableData->FindRow<FItemRarityTable>(*RowName.Find(ItemRare), TEXT(""));
+
+		//switch (ItemRare)
+		//{
+		//case EItemRare::EIR_Damaged:
+		//	RarityRow = *RarityTableObject->FindRow<FItemRarityTable>(FName("Damaged"), TEXT(""));
+		//	break;
+		//case EItemRare::EIR_Common:
+		//	RarityRow = *RarityTableObject->FindRow<FItemRarityTable>(FName("Common"), TEXT(""));
+		//	break;
+		//case EItemRare::EIR_Uncommon:
+		//	RarityRow = *RarityTableObject->FindRow<FItemRarityTable>(FName("Uncommon"), TEXT(""));
+		//	break;
+		//case EItemRare::EIR_Rare:
+		//	RarityRow = *RarityTableObject->FindRow<FItemRarityTable>(FName("Rare"), TEXT(""));
+		//	break;
+		//case EItemRare::EIR_Legendary:
+		//	RarityRow = *RarityTableObject->FindRow<FItemRarityTable>(FName("Legendary"), TEXT(""));
+		//	break;
+		//}
 	}
 }

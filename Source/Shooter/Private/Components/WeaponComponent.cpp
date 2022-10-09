@@ -13,6 +13,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Particles/ParticleSystem.h"
 #include "Items/Ammo/Ammo.h"
+#include "Components/SkeletalMeshComponent.h"
 
 // Sets default values for this component's properties
 UWeaponComponent::UWeaponComponent()

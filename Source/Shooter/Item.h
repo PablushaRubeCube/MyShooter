@@ -18,10 +18,6 @@ public:
 
 private:// variables
 
-	//Name of specifically item
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	FString ItemName = FString("Default");
-
 	//Count Stars
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	TArray<bool> ActiveStars;
@@ -72,10 +68,6 @@ private://functions
 
 protected://variables
 
-	//Skeletal Mesh of item
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	class USkeletalMeshComponent* ItemMesh;
-
 	//Collides with the box to show widget 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Base Properties")
 	class UBoxComponent* CollisionBox;
@@ -92,21 +84,17 @@ protected://variables
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rarity", meta = (AllowPrivateAccess = "true"))
 	EItemRare ItemRare = EItemRare::EIR_MAX;
 
-	//Amount our ammo
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo", meta = (AllowPrivateAccess = "true"))
-	int32 AmmoAmount = 0.f;
+	///** Sound pickup current item */
+	//UPROPERTY(EditAnywhere, Category = "Sound")
+	//class USoundCue* PickupSound;
 
-	/** Sound pickup current item */
-	UPROPERTY(EditAnywhere, Category = "Sound")
-	class USoundCue* PickupSound;
-
-	/** Sound Equip current item */
-	UPROPERTY(EditAnywhere, Category = "Sound")
-	USoundCue* EquipSound;
-	
-	/** Set Pickup widget Icon*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget")
-	UTexture2D* WidgetIcon;
+	///** Sound Equip current item */
+	//UPROPERTY(EditAnywhere, Category = "Sound")
+	//USoundCue* EquipSound;
+	//
+	///** Set Pickup widget Icon*/
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget")
+	//UTexture2D* WidgetIcon;
 
 	/** Set Material for the Mesh */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Material")
@@ -124,7 +112,7 @@ protected://variables
 	FGlowMaterial GlowMaterial;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Rarity")
-	UDataTable* RarityTableObject;
+	UDataTable* RarityTableData;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Rarity")
 	FItemRarityTable RarityRow;
@@ -153,13 +141,18 @@ protected://functions
 	// Call if IsBeTaken true. after that start interp movement item
 	void ItemInterp(float DeltaTime);
 
-	virtual UMeshComponent* GetMeshComponent() const { return ItemMesh; }
+	//Ovveride Mesh in Child. Weapon -> SkeletalMeshComponent, Ammo -> StaticMeshComponent
+	virtual UMeshComponent* GetMeshComponent() PURE_VIRTUAL(AItem::GetMeshComponent, return nullptr;);
 
 	void ToggleCustomDepth(bool bEnableCustomDepth);
 
 	void ToggleGlowMaterial(bool bEnableGlowMaterial);
 
 	void SetRarity();
+
+	//Get Sounds
+	virtual class USoundCue* GetPickupSound() PURE_VIRTUAL(AItem::USoundCue, return nullptr; );
+	virtual USoundCue* GetEquipSound() PURE_VIRTUAL(AItem::USoundCue, return nullptr; );
 
 public://functions
 
@@ -170,20 +163,12 @@ public://functions
 	FORCEINLINE UBoxComponent* GetCollisionBox() const { return CollisionBox; }
 	FORCEINLINE USphereComponent* GetAgroSphere() const { return  AgroSphere; }
 
-	FORCEINLINE USkeletalMeshComponent* GetSkeletalMeshComponent() const { return ItemMesh; }
-
 	//Set/get for State Item
 	FORCEINLINE EItemStates GetItemStates() const { return ItemStates; }
 	void SetItemStates(EItemStates State);
 
 	//Char call when start pickup item
 	virtual	void StartPickupItem(AShooterCharacter* Char);
-
-	//Get Sounds
-	FORCEINLINE USoundCue* GetPickupSound() const { return PickupSound; }
-	FORCEINLINE USoundCue* GetEquipSound() const { return EquipSound; }
-
-	FORCEINLINE int32 GetAmmoAmount() const { return AmmoAmount; }
 
 	virtual void GetPickupItem();
 
