@@ -206,7 +206,7 @@ public://functions
 
 	void GetPickupItem(class AItem* Item);
 
-	FORCEINLINE ECombatState GetECombatState() const { return CombatState; }
+	FORCEINLINE ECombatState GetCombatState() const { return CombatState; }
 
 	FORCEINLINE void SetECombatState(ECombatState State) { CombatState = State; }
 

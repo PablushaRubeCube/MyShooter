@@ -50,7 +50,7 @@ void UInventoryComponent::ChooseInventoryItem(int32 IndexItem)
 {
 	AShooterCharacter* Char = Cast<AShooterCharacter>(GetOwner());
 	if (!Char || !WeaponList.IsValidIndex(IndexItem)) return;
-	if (Char->GetECombatState() == ECombatState::ECS_Unoccupied || Char->GetECombatState() == ECombatState::ECS_Equiping)
+	if (Char->GetCombatState() == ECombatState::ECS_Unoccupied || Char->GetCombatState() == ECombatState::ECS_Equiping)
 	{
 		const auto WeaponComponent = Cast<UWeaponComponent>(GetOwner()->GetComponentByClass(UWeaponComponent::StaticClass()));
 		if (!WeaponComponent) return;

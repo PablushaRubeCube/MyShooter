@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "ShooterCoreTypes.h"
 #include "ShooterAnimInstance.generated.h"
+
 
 /**
  * 
@@ -76,6 +78,12 @@ private://variables
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Crouch", meta = (AllowPrivateAccess = "true"))
 	bool bIsTurnInPlaceAnimPlaying = false;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	EWeaponType EquipWeaponType;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	bool bIsCanFABRIK;
+
 private://functions
 
 	void InPlace(AShooterCharacter* Char);
@@ -93,6 +101,9 @@ private://functions
 
 	bool IsCharacterValid();
 
+	void SetWeaponType();
+
+	void IsCanFABRIK();
 public:
 	
 	UFUNCTION(BlueprintCallable)

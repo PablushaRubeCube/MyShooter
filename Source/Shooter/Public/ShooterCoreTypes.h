@@ -29,10 +29,6 @@ struct FWeaponPropertiesTable : public FTableRowBase
 {
 	GENERATED_BODY()
 
-		//Name of specifically item
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Name")
-	FString ItemName = FString("Default");
-
 	/**Store Ammo Value current Weapon*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Magazine")
 	int32 Ammo;
@@ -54,18 +50,16 @@ struct FWeaponPropertiesTable : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget")
 	UTexture2D* InventoryIcon;
 
-	/** Set Pickup widget Icon*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget")
-	UTexture2D* AmmoIcon;
+	// Store Clip weapon bone Name
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
+	FName ClipBoneName;
 
-	/** Sound Equip current item */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
-	class USoundCue* EquipSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
+	TSubclassOf<class UAnimInstance> WeaponAnimInstance;
 
-	///** Sound pickup current item */
-	UPROPERTY(EditAnywhere, Category = "Sound")
-	class USoundCue* PickupSound;
-
+	//Store anim montage Name current weapon
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
+	FName MontageWeaponName;
 };
 
 //item
@@ -144,4 +138,32 @@ struct FItemRarityTable : public FTableRowBase
 	int32 CustomDepthStencil;
 };
 
+USTRUCT(BlueprintType)
+struct FItemPropertiesTable : public FTableRowBase
+{
+	GENERATED_BODY()
 
+	//Name of specifically item
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Name")
+	FString ItemName = FString("Default");
+
+	/** Sound Equip current item */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
+	class USoundCue* EquipSound;
+
+	///** Sound pickup current item */
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	class USoundCue* PickupSound;
+
+	/** Set Material for the Mesh */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Material")
+	UMaterialInstance* MeshMaterial;
+
+	/** Store Material index for dynamic changes */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Material")
+	int32 MaterialIndex;
+
+	/** Set Pickup widget Icon*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget")
+	UTexture2D* WidgetIcon;
+};

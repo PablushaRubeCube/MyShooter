@@ -62,8 +62,6 @@ private://functions
 
 	void UpdateGlowMaterial();
 
-	void SetColorFresnel();
-
 	void SetDepthStencilValue();
 
 protected://variables
@@ -84,26 +82,6 @@ protected://variables
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rarity", meta = (AllowPrivateAccess = "true"))
 	EItemRare ItemRare = EItemRare::EIR_MAX;
 
-	///** Sound pickup current item */
-	//UPROPERTY(EditAnywhere, Category = "Sound")
-	//class USoundCue* PickupSound;
-
-	///** Sound Equip current item */
-	//UPROPERTY(EditAnywhere, Category = "Sound")
-	//USoundCue* EquipSound;
-	//
-	///** Set Pickup widget Icon*/
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget")
-	//UTexture2D* WidgetIcon;
-
-	/** Set Material for the Mesh */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Material")
-	UMaterialInstance* MeshMaterial;
-
-	/** Store Material index for dynamic changes */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Material")
-	int32 MaterialIndex = 0;
-
 	//Store Glow material for gun
 	UPROPERTY()
 	UMaterialInstanceDynamic* MeshMaterialDynamic;
@@ -116,6 +94,9 @@ protected://variables
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Rarity")
 	FItemRarityTable RarityRow;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+	FItemPropertiesTable ItemPropertiesRow;
 
 protected://functions
 	// Called when the game starts or when spawned
@@ -141,19 +122,24 @@ protected://functions
 	// Call if IsBeTaken true. after that start interp movement item
 	void ItemInterp(float DeltaTime);
 
-	//Ovveride Mesh in Child. Weapon -> SkeletalMeshComponent, Ammo -> StaticMeshComponent
-	virtual UMeshComponent* GetMeshComponent() PURE_VIRTUAL(AItem::GetMeshComponent, return nullptr;);
-
 	void ToggleCustomDepth(bool bEnableCustomDepth);
 
 	void ToggleGlowMaterial(bool bEnableGlowMaterial);
 
+	void SetColorFresnel();
+
 	void SetRarity();
 
-	//Get Sounds
-	virtual class USoundCue* GetPickupSound() PURE_VIRTUAL(AItem::USoundCue, return nullptr; );
-	virtual USoundCue* GetEquipSound() PURE_VIRTUAL(AItem::USoundCue, return nullptr; );
+	//Ovveride Mesh in Child. Weapon -> SkeletalMeshComponent, Ammo -> StaticMeshComponent
+	virtual UMeshComponent* GetMeshComponent() PURE_VIRTUAL(AItem::GetMeshComponent, return nullptr;);
 
+	//Get Sounds
+	virtual class USoundCue* GetPickupSound() { return ItemPropertiesRow.PickupSound; }
+	virtual USoundCue* GetEquipSound() { return ItemPropertiesRow.EquipSound; }
+
+	//Material
+	UMaterialInstance* GetMeshMaterial() { return ItemPropertiesRow.MeshMaterial; };
+	int32 GetMaterialIndex() { return ItemPropertiesRow.MaterialIndex; };
 public://functions
 
 	virtual void Tick(float DeltaTime) override;

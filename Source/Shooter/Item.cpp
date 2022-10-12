@@ -51,7 +51,6 @@ void AItem::BeginPlay()
 void AItem::OnConstruction(const FTransform& Transform)
 {
 	SetRarity();
-	SetColorFresnel();
 	SetDepthStencilValue();
 }
 
@@ -103,11 +102,11 @@ void AItem::UpdateGlowMaterial()
 
 void AItem::SetColorFresnel()
 {
-	if (MeshMaterial)
+	if (GetMeshMaterial())
 	{
-		MeshMaterialDynamic = UMaterialInstanceDynamic::Create(MeshMaterial, this);
+		MeshMaterialDynamic = UMaterialInstanceDynamic::Create(GetMeshMaterial(), this);
 		MeshMaterialDynamic->SetVectorParameterValue(TEXT("Color Fresnel"), RarityRow.GlowColor);
-		GetMeshComponent()->SetMaterial(MaterialIndex, MeshMaterialDynamic);
+		GetMeshComponent()->SetMaterial(GetMaterialIndex(), MeshMaterialDynamic);
 	}
 }
 

@@ -3,6 +3,8 @@
 
 #include "ShooterAnimInstance.h"
 #include "ShooterCharacter.h"
+#include "Components/WeaponComponent.h"
+#include "Weapon.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -21,7 +23,7 @@ void UShooterAnimInstance::InPlace(AShooterCharacter* Char)
 	}
 	else
 	{
-		bCharacterIsReloading = Char->GetECombatState() == ECombatState::ECS_Reloading;
+		bCharacterIsReloading = Char->GetCombatState() == ECombatState::ECS_Reloading;
 		ControllerPitch = Char->GetBaseAimRotation().Pitch;
 		LastCharacterYaw = CharacterYaw;
 		CharacterYaw = Char->GetActorRotation().Yaw;
@@ -105,6 +107,20 @@ bool UShooterAnimInstance::IsCharacterValid()
 	return true;
 }
 
+void UShooterAnimInstance::SetWeaponType()
+{
+	const auto WeaponComponent = Cast<UWeaponComponent>(ShooterCharacter->GetComponentByClass(UWeaponComponent::StaticClass()));
+	if (!WeaponComponent || !WeaponComponent->GetEquippedWeapon()) return;
+	EquipWeaponType = WeaponComponent->GetEquippedWeapon()->GetWeaponType();
+}
+
+void UShooterAnimInstance::IsCanFABRIK()
+{
+	bIsCanFABRIK = 
+		(ShooterCharacter->GetCombatState() == ECombatState::ECS_Unoccupied
+		|| ShooterCharacter->GetCombatState() == ECombatState::ECS_FireTimerProgress);
+}
+
 void UShooterAnimInstance::SetMovementOffsetYaw()
 {
 	//our char Acceleration? change bool bIsAcceleration
@@ -138,6 +154,8 @@ void  UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
 	InPlace(ShooterCharacter);
 	Lean(ShooterCharacter, DeltaTime);
 	SetBlendWeight();
+	SetWeaponType();
+	IsCanFABRIK();
 }
 
 void UShooterAnimInstance::NativeInitializeAnimation()

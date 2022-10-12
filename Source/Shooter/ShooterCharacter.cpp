@@ -86,9 +86,6 @@ void AShooterCharacter::BeginPlay()
 void AShooterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-//	FVector Vector = (FollowCamera->GetComponentLocation() + (FollowCamera->GetForwardVector() * FollowCamera->PickupAmmoLocation[0]));
-//	UE_LOG(LogCharacter, Display, TEXT("The vector value is: %s"), *Vector.ToString());
 
 	//Handle Interp Zoom when we aim
 	InterpZoomFOV(DeltaTime);
@@ -99,7 +96,6 @@ void AShooterCharacter::Tick(float DeltaTime)
 	CalculateCrosshireSpead(DeltaTime);
 		
 	TraceForItem();
-	
 }
 
 void AShooterCharacter::TraceForItem()

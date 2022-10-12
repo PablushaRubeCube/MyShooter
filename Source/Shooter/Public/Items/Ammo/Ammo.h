@@ -33,18 +33,6 @@ protected://variables
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo")
 	int32 AmmoAmount = 0.f;
 
-	/** Sound pickup current item */
-	UPROPERTY(EditAnywhere, Category = "Sound")
-	class USoundCue* PickupSound;
-
-	/** Sound Equip current item */
-	UPROPERTY(EditAnywhere, Category = "Sound")
-	USoundCue* EquipSound;
-
-	/** Set Pickup widget Icon*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget")
-	UTexture2D* AmmoIcon;
-
 protected://functions
 	
 	virtual UMeshComponent* GetMeshComponent()  override { return AmmoMesh; }
@@ -66,7 +54,4 @@ public://functions
 
 	//Char call when start pickup item
 	virtual	void StartPickupItem(AShooterCharacter* Char) override;
-
-	virtual class USoundCue* GetPickupSound() override { return PickupSound; }
-	virtual USoundCue* GetEquipSound() override { return EquipSound; }
 };

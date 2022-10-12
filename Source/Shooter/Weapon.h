@@ -31,19 +31,13 @@ private://variables
 private://Functions
 	void SetWeaponProperties();
 
+	void SetItemProperties();
+
 protected://variables
 
 	//Skeletal Mesh of item
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	class USkeletalMeshComponent* ItemMesh;
-
-	//Store anim montage Name current weapon
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	FName MontageWeaponName = "Reload_SMG";
-
-	// Store Clip weapon bone Name
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	FName ClipBoneName = "smg_clip";
 
 	UPROPERTY(BlueprintReadOnly, Category = "Weapon")
 	bool IsClipTaked = false;
@@ -53,6 +47,9 @@ protected://variables
 	/**Store type of Weapon*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
 	EWeaponType WeaponType;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Item")
+	UDataTable* ItemPropertiesToWeapon;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	UDataTable* WeaponPropertiesData;
@@ -74,11 +71,7 @@ protected://functions
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	virtual UMeshComponent* GetMeshComponent() override { return ItemMesh; }
-
-	//Get Sounds
-	virtual class USoundCue* GetPickupSound() override { return WeaponPropertiesRow.PickupSound; }
-	virtual USoundCue* GetEquipSound() override { return WeaponPropertiesRow.EquipSound; }
-
+	
 public:
 	/** Call when player Throw Weapon */
 	void ThrowWeapon();
@@ -91,8 +84,8 @@ public:
 	UFUNCTION(BlueprintPure)
 	EAmmoType GetAmmoType() const { return WeaponPropertiesRow.AmmoType; }
 
-	FORCEINLINE FName GetMontageWeaponSectionName() const { return MontageWeaponName; }
-	FORCEINLINE FName GetClipBoneName() const { return ClipBoneName; }
+	FORCEINLINE FName GetMontageWeaponSectionName() const { return WeaponPropertiesRow.MontageWeaponName; }
+	FORCEINLINE FName GetClipBoneName() const { return WeaponPropertiesRow.ClipBoneName; }
 	FORCEINLINE void SetIsClipTaked(bool ClipState) { IsClipTaked = ClipState; }
 
 	/** Decrement Ammo when we Shoot */

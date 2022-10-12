@@ -95,27 +95,20 @@ void AWeapon::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 	SetWeaponProperties();
+	SetItemProperties();
+	SetColorFresnel();
 }
 
 void AWeapon::SetWeaponProperties()
 {
-	if (WeaponPropertiesData && !RowName.Contains(WeaponType)) return;
-	WeaponPropertiesRow = *WeaponPropertiesData->FindRow<FWeaponPropertiesTable>(*RowName.Find(WeaponType), TEXT(""));
+	if (!WeaponPropertiesData || !RowName.Contains(GetWeaponType())) return;
+	WeaponPropertiesRow = *WeaponPropertiesData->FindRow<FWeaponPropertiesTable>(*RowName.Find(GetWeaponType()), TEXT(""));
 	GetSkeletalMeshComponent()->SetSkeletalMesh(WeaponPropertiesRow.WeaponMesh);
-	/*	switch (GetWeaponType())
-		{
-		case EWeaponType::EWT_SubmachineGun:
-			WeaponPropertiesRow = *WeaponPropertiesData->FindRow<FWeaponPropertiesTable>(TEXT("SubmachineGun"),"");
-			break;
-		case EWeaponType::EWT_AssaultRifle:
-			WeaponPropertiesRow = *WeaponPropertiesData->FindRow<FWeaponPropertiesTable>(TEXT("AssaultRifle"), "");
-			break;
-		case EWeaponType::EWT_Pistol:
-			WeaponPropertiesRow = *WeaponPropertiesData->FindRow<FWeaponPropertiesTable>(TEXT("Pistol"), "");
-			break;
-		case EWeaponType::EWT_MAX:
-			break;
-		default:
-			break;
-		}*/
+	GetSkeletalMeshComponent()->SetAnimInstanceClass(WeaponPropertiesRow.WeaponAnimInstance);
+}
+
+void AWeapon::SetItemProperties()
+{
+	if (!ItemPropertiesToWeapon || !RowName.Contains(GetWeaponType())) return;
+	ItemPropertiesRow = *ItemPropertiesToWeapon->FindRow<FItemPropertiesTable>(*RowName.Find(GetWeaponType()), TEXT(""));
 }

@@ -27,7 +27,7 @@ UWeaponComponent::UWeaponComponent()
 
 void UWeaponComponent::ReloadWeapon()
 {
-	if (!CharOwner || CharOwner->GetECombatState() != ECombatState::ECS_Unoccupied) return;
+	if (!CharOwner || CharOwner->GetCombatState() != ECombatState::ECS_Unoccupied) return;
 	if (!EquippedWeapon || EquippedWeapon->IsMagazineFull()) return;
 
 	if (CarryingAmmo())
@@ -84,7 +84,7 @@ bool UWeaponComponent::CarryingAmmo()
 
 void UWeaponComponent::TakeClip()
 {
-	if (!CharOwner || EquippedWeapon || !CharOwner->GetHandSceneComponent()) return;
+	if (!CharOwner || !EquippedWeapon || !CharOwner->GetHandSceneComponent()) return;
 	const int32 BoneIndexClip = EquippedWeapon->GetSkeletalMeshComponent()->GetBoneIndex(EquippedWeapon->GetClipBoneName());
 	const FTransform BoneTransformClip = EquippedWeapon->GetSkeletalMeshComponent()->GetBoneTransform(BoneIndexClip);
 
@@ -228,7 +228,7 @@ void UWeaponComponent::PlayGunFireMontage()
 void UWeaponComponent::FireWeapon()
 {
 	if (!EquippedWeapon || !CharOwner) return;
-	if (CharOwner->GetECombatState() != ECombatState::ECS_Unoccupied) return;
+	if (CharOwner->GetCombatState() != ECombatState::ECS_Unoccupied) return;
 
 	if (!IsAmmoEmpty())
 	{
@@ -325,7 +325,7 @@ bool UWeaponComponent::GetAimingCondition()
 
 bool UWeaponComponent::IsCanAim()
 {
-	if (!CharOwner || CharOwner->GetECombatState() == ECombatState::ECS_Reloading) return false;
+	if (!CharOwner || CharOwner->GetCombatState() == ECombatState::ECS_Reloading) return false;
 	return true;
 }
 
