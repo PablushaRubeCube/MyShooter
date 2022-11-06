@@ -209,7 +209,6 @@ void AItem::StartPickupItem(AShooterCharacter* Char)
 	ItemStartCurveLocation = GetActorLocation();
 
 	SetItemStates(EItemStates::EIS_EquipInterping);
-	//ToggleCustomDepth(true);
 	GetWorldTimerManager().SetTimer(TimerInterpCurve, this, &AItem::FinishInterpItem, InterpTimeCurve);
 
 	const auto CameraComponent = Cast<UCameraComponent>(Char->GetComponentByClass(UCameraComponent::StaticClass()));

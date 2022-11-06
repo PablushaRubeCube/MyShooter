@@ -14,6 +14,10 @@
 #include "Particles/ParticleSystem.h"
 #include "Items/Ammo/Ammo.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Interface/BulletHitinterface.h"
+#include "Enemy/EnemyCharacter.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogWeaponComponent, All, All)
 
 // Sets default values for this component's properties
 UWeaponComponent::UWeaponComponent()
@@ -131,6 +135,7 @@ void UWeaponComponent::EquipWeapon(AWeapon* EquipWeapon)
 		}
 		EquippedWeapon = EquipWeapon; // set equippedWEapon
 		EquippedWeapon->SetItemStates(EItemStates::EIS_Equipped);//Change Item State
+		EquippedWeapon->SetOwner(GetOwner());
 	}
 }
 
@@ -180,37 +185,45 @@ void UWeaponComponent::PlayFireSound()
 	UGameplayStatics::PlaySound2D(this, FireShotSound);
 }
 
+
+bool UWeaponComponent::GetBarrelSocketTransform(FTransform& SocketTransform)
+{
+	if (!EquippedWeapon) return false;
+	const USkeletalMeshSocket* BarrelSocket = EquippedWeapon->GetSkeletalMeshComponent()->GetSocketByName(TEXT("BarrelSocket"));//get socket weapon
+	if (!BarrelSocket) return false;//..we have socket for shoot?
+	SocketTransform = BarrelSocket->GetSocketTransform(EquippedWeapon->GetSkeletalMeshComponent());//get socket transform
+	return true;
+}
+
 void UWeaponComponent::SendBullet()
 {
-	//send bullet
-	const USkeletalMeshSocket* BarrelSocket = EquippedWeapon->GetSkeletalMeshComponent()->GetSocketByName(TEXT("BarrelSocket"));//get socket weapon
-
-	if (BarrelSocket)//..we have socket for shoot?
+	FTransform SocketTransform;
+	if (!GetBarrelSocketTransform(SocketTransform)) return;
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);// if we have ShotParticles->Spawn
+	//Update BeamEndPoint for Particles
+	FHitResult WeaponHitRelust;
+	bool bIsHitSomething = GetHitEndLocation(SocketTransform.GetLocation(), WeaponHitRelust);
+	if (bIsHitSomething)
 	{
-		const FTransform SocketTransform = BarrelSocket->GetSocketTransform(EquippedWeapon->GetSkeletalMeshComponent());//get socket transform
-		if (MuzzleFlash)// if we have ShotParticles->Spawn
+		if(const auto Enemy = Cast<AEnemyCharacter>(WeaponHitRelust.GetActor()))
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
+			EquippedWeapon->DamageEnemyCharacter(WeaponHitRelust);
 		}
-		//Update BeamEndPoint for Particles
-		FVector BeamEndPoint;
-		bool bBeamLocation = GetBeamEndLocation(SocketTransform.GetLocation(), BeamEndPoint);
-		if (bBeamLocation)
+		const auto Interface = Cast<IBulletHitInterface>(WeaponHitRelust.Actor);
+		if (Interface)
+		{
+			Interface->BulletHit_Implementation(WeaponHitRelust);
+		}
+		else
 		{
 			//spawn impactParticle after update BeamEnd
-			if (ImpactParticles)
-			{
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, BeamEndPoint);
-			}
-			if (BeamParticles)
-			{
-				UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, SocketTransform);
-				Beam->SetVectorParameter("Target", BeamEndPoint);
-			}
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, WeaponHitRelust.Location);
 		}
-		//Change Spread bool bShooting and start timer
-		StartCrosshiresFire();
+		UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, SocketTransform);
+		Beam->SetVectorParameter("Target", WeaponHitRelust.Location);
 	}
+	//Change Spread bool bShooting and start timer
+	StartCrosshiresFire();
 }
 
 void UWeaponComponent::PlayGunFireMontage()
@@ -242,27 +255,19 @@ void UWeaponComponent::FireWeapon()
 	}
 }
 
-bool UWeaponComponent::GetBeamEndLocation(const FVector& SocketBeam, FVector& OutBeamLocation)
+bool UWeaponComponent::GetHitEndLocation(const FVector& SocketBeam, FHitResult& WeaponHitRelust)
 {
 	if (!CharOwner) return false;
 	//first linetrace from center of screen to target
 	FHitResult BeamHitResult;
-	bool bBeamHit = CharOwner->LineTracePickUp(BeamHitResult, OutBeamLocation);
-	if (bBeamHit)
+	bool bBeamHit = CharOwner->LineTracePickUp(BeamHitResult, WeaponHitRelust.Location);
+	if (bBeamHit && BeamHitResult.bBlockingHit)
 	{
-		if (BeamHitResult.bBlockingHit)
-		{
-			OutBeamLocation = BeamHitResult.Location;////Set variablie "OutBeamLocation" if we hit something
-		}
-		else
-		{
-			//Set variablie "OutBeamLocation" in function "ToogleVisibilityWidgetPickUp" if we did we hit nothing
-		}
+		WeaponHitRelust.Location = BeamHitResult.Location;////Set variablie "WeaponHitRelust" if we hit something
 	}
 	//Second LineTrace From barrel to BeamEnd
-	FHitResult WeaponHitRelust;
 	const FVector WeaponStartPoint{ SocketBeam };
-	const FVector StartToEnd{ OutBeamLocation - SocketBeam };
+	const FVector StartToEnd{ WeaponHitRelust.Location - SocketBeam };
 	const FVector WeaponEndPoint{ SocketBeam + StartToEnd * 1.25f };
 	GetWorld()->LineTraceSingleByChannel(
 		WeaponHitRelust,
@@ -270,10 +275,10 @@ bool UWeaponComponent::GetBeamEndLocation(const FVector& SocketBeam, FVector& Ou
 		WeaponEndPoint,
 		ECollisionChannel::ECC_Visibility);
 
-	//Change BeamEnd if beetwen barrel and BeamEnd have somethink
+	//Change BeamEnd if beetwen barrel and BeamEnd have something
 	if (WeaponHitRelust.bBlockingHit)
 	{
-		OutBeamLocation = WeaponHitRelust.Location;
+		WeaponHitRelust.Location = WeaponHitRelust.Location;
 		return true;
 	}
 	return false;

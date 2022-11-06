@@ -116,6 +116,8 @@ private://functions
 	/** Play sound if we fire*/
 	void PlayFireSound();
 
+	bool GetBarrelSocketTransform(FTransform& SocketTransform);
+
 	/** main function when we fire*/
 	void SendBullet();
 
@@ -126,7 +128,7 @@ private://functions
 	void FireWeapon();
 
 	//Create and return BeamLocation for particles shots 
-	bool GetBeamEndLocation(const FVector& SocketBeam, FVector& OutBeamLocation);
+	bool GetHitEndLocation(const FVector& SocketBeam, FHitResult& WeaponHitRelust);
 
 	//Change Crosshire Spread when we shoting
 	void StartCrosshiresFire();

@@ -51,9 +51,3 @@ void AAmmo::StartPickupItem(AShooterCharacter* Char)
 
 	IndexInterpLocation = Char->GetInterpIndexLocation();
 }
-
-
-//void AAmmo::SetItemProperties(EItemStates State, UMeshComponent* Mesh)
-//{
-//	Super::SetItemProperties(State, AmmoMesh);
-//}

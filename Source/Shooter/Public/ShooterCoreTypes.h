@@ -4,6 +4,19 @@
 #include "ShooterCoreTypes.generated.h"
 
 
+//AnimNotify
+USTRUCT(BlueprintType)
+struct FFootstepsFX 
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
+	class USoundCue* FootStepsSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
+	class UNiagaraSystem* FootstepsParticles;
+};
+
 //weapon
 UENUM(BlueprintType)
 enum class EAmmoType : uint8
@@ -60,6 +73,10 @@ struct FWeaponPropertiesTable : public FTableRowBase
 	//Store anim montage Name current weapon
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
 	FName MontageWeaponName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Damage")
+	float Damage;
+
 };
 
 //item

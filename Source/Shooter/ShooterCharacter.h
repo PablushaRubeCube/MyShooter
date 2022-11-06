@@ -69,6 +69,8 @@ protected://functions
 	void CrouchButtonPressed();
 	void ToogleCrouch(bool CharacterIsCrouched);
 
+	void GetFootstepsHit(FHitResult& Hit) const;
+
 private://variables
 
 	//Camera boom positioning the camera behind the character
@@ -219,4 +221,6 @@ public://functions
 	int32 GetInterpIndexLocation();
 
 	void ShowPickupArrowSlot(const bool bIsTraceForItem);
+
+	UPhysicalMaterial* GetFootstepPhysicalMaterial();
 };

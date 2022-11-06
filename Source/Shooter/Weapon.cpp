@@ -26,6 +26,22 @@ bool AWeapon::IsMagazineFull()
 	return GetMagazineCapacity() == GetAmmo();
 }
 
+void AWeapon::DamageEnemyCharacter(const FHitResult& HitResult)
+{
+	const auto CharOwner = Cast<AShooterCharacter>(GetOwner());
+	if (!CharOwner) return;
+	AController* OwnerController = Cast<AController>(CharOwner->GetController());
+	if (!OwnerController) return;
+	UGameplayStatics::ApplyPointDamage(
+		HitResult.GetActor(),
+		HitResult.BoneName == FName("head") ? WeaponPropertiesRow.Damage * 10 : WeaponPropertiesRow.Damage,
+		HitResult.TraceStart,
+		HitResult,
+		OwnerController,
+		this,
+		UDamageType::StaticClass());
+}
+
 // Called every frame
 void AWeapon::Tick(float DeltaTime)
 {
@@ -97,6 +113,7 @@ void AWeapon::OnConstruction(const FTransform& Transform)
 	SetWeaponProperties();
 	SetItemProperties();
 	SetColorFresnel();
+
 }
 
 void AWeapon::SetWeaponProperties()

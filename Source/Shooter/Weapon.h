@@ -95,4 +95,6 @@ public:
 	bool IsMagazineFull();
 
 	FORCEINLINE USkeletalMeshComponent* GetSkeletalMeshComponent() const { return ItemMesh; }
+
+	void DamageEnemyCharacter(const FHitResult& HitResult);
 };

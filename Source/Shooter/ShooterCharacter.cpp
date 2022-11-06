@@ -14,6 +14,10 @@
 #include "Components/PickupComponent.h"
 #include "Components/InventoryComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
+#include "Kismet/KismetSystemLibrary.h"
+
 
 DEFINE_LOG_CATEGORY_STATIC(LogCharacter, All, All)
 
@@ -63,6 +67,15 @@ void AShooterCharacter::ShowPickupArrowSlot(const bool bIsTraceForItem)
 	}
 }
 
+UPhysicalMaterial* AShooterCharacter::GetFootstepPhysicalMaterial()
+{
+	FHitResult FootStepsHit;
+	GetFootstepsHit(FootStepsHit);
+	if(!FootStepsHit.PhysMaterial.IsValid()) return nullptr;
+	UPhysicalMaterial* PhysMaterial = FootStepsHit.PhysMaterial.Get();
+	return PhysMaterial;
+}
+
 // Called when the game starts or when spawned
 void AShooterCharacter::BeginPlay()
 {
@@ -96,6 +109,8 @@ void AShooterCharacter::Tick(float DeltaTime)
 	CalculateCrosshireSpead(DeltaTime);
 		
 	TraceForItem();
+
+
 }
 
 void AShooterCharacter::TraceForItem()
@@ -177,9 +192,7 @@ FVector AShooterCharacter::GetInterpLocation(const AItem* Item)
 	const auto Ammo = Cast<AAmmo>(Item);
 	if (Ammo)
 	{
-		const FVector CameraLocation{ FollowCamera->GetComponentLocation() };
-		const FVector CameraForwardLocation{ FollowCamera->GetForwardVector() };
-		return CameraLocation + (CameraForwardLocation * FollowCamera->PickupAmmoLocation[Ammo->GetIndexInterpLocation()]);
+		return UKismetMathLibrary::TransformLocation(FollowCamera->GetComponentTransform(), FollowCamera->PickupAmmoLocation[Ammo->GetIndexInterpLocation()]);
 	}
 	return GetCameraInterpLocation();
 }
@@ -228,6 +241,16 @@ void AShooterCharacter::ToogleCrouch(bool CharacterIsCrouched)
 	{
 		Crouch();
 	}	
+}
+
+void AShooterCharacter::GetFootstepsHit(FHitResult& Hit) const
+{
+	if (!GetWorld())return;
+	FCollisionQueryParams QueryParams;
+	QueryParams.bReturnPhysicalMaterial = true;
+	const FVector EndLine {GetActorLocation() + FVector{0.f,0.f, -400.f} };
+	GetWorld()->LineTraceSingleByChannel
+	(Hit, GetActorLocation(), EndLine, ECollisionChannel::ECC_Visibility, QueryParams);
 }
 
 void AShooterCharacter::GetPickupItem(AItem* Item)
